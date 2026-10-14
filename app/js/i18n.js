@@ -49,6 +49,8 @@ const STRINGS = {
     mistake: { concept: 'Concept wrong', misapplied: 'Misapplied', expression: 'Weak expression', diagram: 'Diagram error', incomplete: 'Incomplete / time' },
     // family page
     familyTitle: 'Progress report', familyIntro: 'Updated after every marked paper.', ppRecord: 'Past-paper record',
+    mistakeTypesTitle: 'Reasons marks are lost', hide: 'Hide',
+    mistakeTypesHint: 'Rename, add or hide reasons. Hidden reasons disappear from logging; old papers keep their tags.',
     report: 'Report', reportTitle: 'Progress report', reportPeriod: 'Period', from: 'From', to: 'To', makePdf: 'Create PDF',
     making: 'Creating PDF…', reportLang: 'Report language', papersInPeriod: 'Past papers in this period',
     noneInPeriod: 'No past papers logged in this period.', asOf: (d) => `as of ${d}`, preparedBy: 'Prepared by Lawrence · Kairos｜DSE 經濟',
@@ -91,6 +93,8 @@ const STRINGS = {
     bankBuilt: (d) => `題庫於 ${d} 由 Word 檔匯出。`,
     mistake: { concept: '概念錯', misapplied: '應用錯', expression: '表達弱', diagram: '圖錯', incomplete: '未完成／夠鐘' },
     familyTitle: '學習進度報告', familyIntro: '每份改好嘅試卷都會即時更新。', ppRecord: '歷屆試題紀錄',
+    mistakeTypesTitle: '失分原因', hide: '隱藏',
+    mistakeTypesHint: '可以改名、新增或隱藏。隱藏咗嘅原因唔會再出現喺記錄頁，但舊紀錄會保留。',
     report: '報告', reportTitle: '學習進度報告', reportPeriod: '報告期間', from: '由', to: '至', makePdf: '製作 PDF',
     making: '製作中…', reportLang: '報告語言', papersInPeriod: '期間內完成嘅歷屆試題',
     noneInPeriod: '期間內未有歷屆試題紀錄。', asOf: (d) => `截至 ${d}`, preparedBy: '導師 Lawrence · Kairos｜DSE 經濟',

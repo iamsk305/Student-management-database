@@ -65,6 +65,29 @@ MERGE = {
     (2018, 11, ''): {'labels': ['(balance of payments bullet)', '(living standard, aggregate output)'], 'marks': 10},
 }
 
+# Paper 2 questions the by-topic booklets leave out (mostly the final essay question), tagged by reading the papers
+# on 14 Oct 2026. Edit freely: (year, question, part label, marks, [sub-topics]).
+EXTRA = [
+    (2017, 11, '(b)', 3, ['C.9', 'E.1']), (2017, 11, '(c)', 3, ['E.3']),
+    (2019, 12, '(a)(i)', 3, ['J.2']), (2019, 12, '(a)(ii)', 3, ['J.2', 'J.3']), (2019, 12, '(b)', 3, ['J.1']),
+    (2019, 12, '(c)', 13, ['G.4', 'I.5']),
+    (2020, 10, '(a)(i)', 2, ['J.3']), (2020, 10, '(a)(ii)', 2, ['J.3']), (2020, 10, '(b)(i)', 4, ['J.2']),
+    (2020, 10, '(b)(ii)', 1, ['J.2']), (2020, 10, '(c)', 3, ['J.2', 'C.4']), (2020, 10, '(d)', 2, ['J.2']),
+    (2020, 11, '(a)', 2, ['B.1']), (2020, 11, '(b)', 4, ['C.3']), (2020, 11, '(c)(i)', 3, ['E.2']),
+    (2020, 11, '(c)(ii)', 2, ['E.2']), (2020, 11, '(d)', 2, ['E.2']), (2020, 11, '(e)', 14, ['C.3', 'E.3']),
+    (2020, 11, '(f)', 2, ['E.2']),
+    (2021, 12, '(a)', 2, ['A.3']), (2021, 12, '(b)', 2, ['I.4']), (2021, 12, '(c)', 7, ['C.3']),
+    (2021, 12, '(d)', 3, ['J.3']), (2021, 12, '(e)', 14, ['G.4', 'B.8']), (2021, 12, '(f)', 2, ['I.4']),
+    (2022, 11, '(a)(i)', 2, ['I.1']), (2022, 11, '(a)(ii)', 2, ['I.4']), (2022, 11, '(b)', 2, ['F.1']),
+    (2022, 11, '(c)', 4, ['D.1']), (2022, 11, '(d)', 4, ['H.1']), (2022, 11, '(e)', 14, ['I.4', 'B.8', 'G.4']),
+    (2023, 10, '(b)(ii)', 2, ['I.2']), (2023, 12, '(a)(i)', 3, ['C.3']), (2023, 12, '(a)(ii)', 3, ['C.6']), (2023, 12, '(b)', 3, ['I.3']),
+    (2023, 12, '(c)', 5, ['I.8']), (2023, 12, '(d)', 14, ['I.5', 'E.3', 'J.2']),
+    (2024, 13, '(a)', 4, ['I.7']), (2024, 13, '(b)', 3, ['J.4']), (2024, 13, '(c)', 5, ['C.7']),
+    (2024, 13, '(d)', 14, ['G.4', 'B.8']),
+    (2025, 11, '(a)(i)', 2, ['C.5']), (2025, 11, '(a)(ii)', 2, ['F.1']), (2025, 11, '(b)', 6, ['C.7', 'C.6']),
+    (2025, 11, '(c)', 4, ['C.7']), (2025, 11, '(d)', 14, ['C.7', 'E.3']),
+]
+
 HEADER = re.compile(r'^Q(\d+)\s+(CE|DSE) (\d{4})\s+Q\.?\s*(\d+)\s*(.*?)(?:\s*\((\d+) marks?\))?$')
 BOX = re.compile(r'^\[\s*_+\s*/\s*(\d+)\s*\]$')
 LEAD = re.compile(r'^\(([a-h])\)\s*(?:\((i{1,3}|iv|v|vi)\))?|^\((i{1,3}|iv|v|vi)\)')
@@ -229,6 +252,14 @@ def build(res):
                     continue
                 p2.append({'id': pid, 'q': e['q'], 'label': label, 'marks': marks, 'subs': [e['sub']],
                            'elective': e['booklet'] if e['booklet'] in ('E1', 'E2') else None})
+
+    for (y, q, label, marks, subs) in EXTRA:
+        p2 = papers[str(y)]['p2']
+        pid = f'{y}-Q{q}{label}'
+        if any(x['id'] == pid for x in p2):
+            problems.append(f'EXTRA {pid} already in a booklet')
+            continue
+        p2.append({'id': pid, 'q': q, 'label': label, 'marks': marks, 'subs': subs, 'elective': None})
 
     for y, v in papers.items():
         expected = len(KEYS[y])

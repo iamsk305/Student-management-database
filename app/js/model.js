@@ -30,7 +30,7 @@ export function studentView(index, { student, attempts, responses, taughtSubs = 
     taught,
     overrides: ov,
     predicted: predictLevel(scored, s),
-    mistakes: mistakeSplit(index, responses),
+    mistakes: mistakeSplit(index, responses, s.mistakeTypes.map((m) => m.key)),
     next: nextPractice(index, masteryMap, taught, attempted, { elective: student?.elective || null }),
     lastDate: scored[0]?.date || null,
     settings: s,

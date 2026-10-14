@@ -2,8 +2,8 @@
 // The report is laid out as A4-sized HTML pages (so Chinese text and the Kairos fonts render exactly as in the app),
 // each page is captured with html2canvas and placed into a jsPDF document. Libraries load only when a report is made.
 import { t, subName, withLang, getLang } from './i18n.js';
-import { h, fmtDate, pct, today, modal, field, select, toast, trendChart, syllabusMap } from './ui.js';
-import { MISTAKES, levelName, levelValue, itemLabel, mistakeSplit } from './logic.js';
+import { h, fmtDate, pct, today, modal, field, select, toast, trendChart, syllabusMap, mistakeBars } from './ui.js';
+import { levelName, levelValue, itemLabel, mistakeSplit, withDefaults } from './logic.js';
 import { studentView } from './model.js';
 
 const PAGE_W = 794, PAGE_H = 1123, PAD = 48; // A4 at 96 dpi
@@ -45,7 +45,7 @@ export function reportData(app, studentId, from, to) {
   return {
     view,
     inPeriod,
-    mistakes: mistakeSplit(app.index, responses.filter((r) => periodIds.has(r.attempt_id))),
+    mistakes: mistakeSplit(app.index, responses.filter((r) => periodIds.has(r.attempt_id)), withDefaults(d.settings).mistakeTypes.map((m) => m.key)),
     school,
     from,
     to,
@@ -74,8 +74,7 @@ function blocks(app, rd) {
 
   if (mistakes.total) {
     out.push(h('section.r-sec', h('h3', t('mistakes')),
-      h('div.bars', MISTAKES.map((k) => h('div.bar-row',
-        h('span', t('mistake')[k]), h('div.bar', h('i', { style: { width: `${100 * mistakes.share[k]}%` } })), h('b', pct(100 * mistakes.share[k])))))));
+      mistakeBars(mistakes, v.settings.mistakeTypes)));
   }
 
   if (v.next.length) {

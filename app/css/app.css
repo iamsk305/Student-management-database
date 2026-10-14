@@ -242,3 +242,4 @@ dialog.modal::backdrop { background: rgba(12, 22, 38, .45); }
 .report-page .chip { font-size: 11px; padding: 3px 6px; }
 .report-page .r-foot { margin-top: auto; display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-faint); border-top: 1px solid var(--line); padding-top: 8px; }
 .report-page .chip-name { display: inline; }
+.mistake-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: .5rem; align-items: center; }

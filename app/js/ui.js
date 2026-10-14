@@ -1,5 +1,5 @@
 // Tiny DOM helpers + the two shared visuals (score trend, syllabus map).
-import { t, subName } from './i18n.js';
+import { t, subName, getLang } from './i18n.js';
 import { levelName, levelValue, withDefaults, masteryState } from './logic.js';
 
 /** h('div.card', {onclick}, child, ...) — tag with optional .classes, attributes/props, children. */
@@ -51,6 +51,17 @@ export function field(label, input, hint) {
 
 export function select(options, value, attrs = {}) {
   return h('select', attrs, options.map(([v, l]) => h('option', { value: v, selected: String(v) === String(value ?? '') }, l)));
+}
+
+// ---------- mistakes ----------
+
+/** Bars for where marks are lost: active types in list order, plus any older tag that still has marks. */
+export function mistakeBars(split, types) {
+  const label = (k) => { const m = types.find((x) => x.key === k); return m ? (m[getLang()] || m.en) : k; };
+  const keys = [...types.filter((m) => !m.hidden).map((m) => m.key),
+    ...Object.keys(split.share).filter((k) => split.share[k] > 0 && !types.some((m) => m.key === k && !m.hidden))];
+  return h('div.bars', [...new Set(keys)].map((k) => h('div.bar-row',
+    h('span', label(k)), h('div.bar', h('i', { style: { width: `${100 * (split.share[k] || 0)}%` } })), h('b', pct(100 * (split.share[k] || 0))))));
 }
 
 // ---------- score trend ----------

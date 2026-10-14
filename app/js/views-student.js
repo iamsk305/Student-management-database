@@ -1,7 +1,7 @@
 // One student: overview, syllabus map, PP record, lessons, homework, school results, profile.
 import { t, subName } from './i18n.js';
-import { h, fmtDate, today, pct, modal, field, select, toast, trendChart, syllabusMap, STATES } from './ui.js';
-import { MISTAKES, levelName, levelValue, itemLabel } from './logic.js';
+import { h, fmtDate, today, pct, modal, field, select, toast, trendChart, syllabusMap, STATES, mistakeBars } from './ui.js';
+import { levelName, levelValue, itemLabel } from './logic.js';
 import { newToken } from './store.js';
 import { FAMILY_LINKS } from './config.js';
 import { reportDialog } from './report.js';
@@ -39,8 +39,7 @@ function overview(app, s, v) {
 
   const mis = v.mistakes;
   const mistakes = h('section.card', h('h2', t('mistakes')),
-    mis.total ? h('div.bars', MISTAKES.map((k) => h('div.bar-row',
-      h('span', t('mistake')[k]), h('div.bar', h('i', { style: { width: `${100 * mis.share[k]}%` } })), h('b', pct(100 * mis.share[k]))))) : h('p.muted', t('mistakeNone')));
+    mis.total ? mistakeBars(mis, v.settings.mistakeTypes) : h('p.muted', t('mistakeNone')));
 
   const next = h('section.card', h('h2', t('nextPractice')),
     v.next.length ? v.next.map((n) => {

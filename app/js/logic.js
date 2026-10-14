@@ -1,7 +1,17 @@
 // Pure scoring logic shared by the admin app, the family page and the tests. No DOM, no network.
 
 export const LEVELS = ['1', '2', '3', '4', '5', '5*', '5**'];
-export const MISTAKES = ['concept', 'misapplied', 'expression', 'diagram', 'incomplete'];
+// Why marks were lost. Editable in Settings (renamed, added, hidden); keys never change so old tags keep counting.
+export const DEFAULT_MISTAKES = [
+  { key: 'concept', en: 'Concept wrong', zh: '概念錯' },
+  { key: 'definition', en: 'Definition not memorised', zh: '定義未背熟' },
+  { key: 'misapplied', en: 'Misapplied', zh: '應用錯' },
+  { key: 'expression', en: 'Weak expression', zh: '表達弱' },
+  { key: 'diagram', en: 'Diagram error', zh: '圖錯' },
+  { key: 'incomplete', en: 'Incomplete / ran out of time', zh: '未完成／夠鐘' },
+  { key: 'blank', en: 'Left blank', zh: '留空冇答' },
+];
+export const MISTAKES = DEFAULT_MISTAKES.map((m) => m.key);
 
 // Lawrence's cut-off table (% of full mark), level 2 … 5**. Editable in Settings.
 export const DEFAULT_CUTOFFS = {
@@ -26,6 +36,7 @@ export function withDefaults(settings) {
     mastery: { ...DEFAULT_SETTINGS.mastery, ...s.mastery },
     predictWeights: s.predictWeights || DEFAULT_SETTINGS.predictWeights,
     cutoffs: { ...DEFAULT_CUTOFFS, ...s.cutoffs },
+    mistakeTypes: s.mistakeTypes?.length ? s.mistakeTypes : DEFAULT_MISTAKES,
   };
 }
 
@@ -201,19 +212,22 @@ export function masteryState(sub, m, taught, overrides, settings) {
   return { state, manual: false, pct: m.pct };
 }
 
-/** Share of lost LQ marks by mistake type; marks lost on a part with several tags are split evenly. */
-export function mistakeSplit(index, responses) {
-  const lost = Object.fromEntries(MISTAKES.map((k) => [k, 0]));
+/**
+ * Share of lost LQ marks by mistake type; marks lost on a part with several tags are split evenly.
+ * keys = the types to report on; tags outside it (e.g. from an older list) are still counted.
+ */
+export function mistakeSplit(index, responses, keys = MISTAKES) {
+  const lost = Object.fromEntries(keys.map((k) => [k, 0]));
   let total = 0;
   for (const r of responses) {
     const item = index.items.get(r.qid);
     if (!item || item.kind !== 'lq' || !r.mistakes?.length) continue;
     const gap = item.max - Math.min(Number(r.mark) || 0, item.max);
     if (gap <= 0) continue;
-    for (const k of r.mistakes) if (k in lost) lost[k] += gap / r.mistakes.length;
+    for (const k of r.mistakes) lost[k] = (lost[k] || 0) + gap / r.mistakes.length;
     total += gap;
   }
-  return { total, share: Object.fromEntries(MISTAKES.map((k) => [k, total ? lost[k] / total : 0])) };
+  return { total, share: Object.fromEntries(Object.entries(lost).map(([k, v]) => [k, total ? v / total : 0])) };
 }
 
 /** MC distractors: how often each wrong letter was chosen, per question id. */

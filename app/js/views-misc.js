@@ -71,11 +71,23 @@ export function settingsView(app) {
   const num = (v, attrs = {}) => h('input', { type: 'number', value: v, ...attrs });
   const p1 = num(s.weights.p1 * 100, { min: 0, max: 100, step: 5 });
   const red = num(s.mastery.red), green = num(s.mastery.green), minEv = num(s.mastery.minEvidence), half = num(s.mastery.halfLifeDays);
+  // mistake types: rename / add / hide. Keys stay fixed so tags on old papers keep counting.
+  const mistakeRows = h('div.stack');
+  const addMistakeRow = (m) => {
+    const en = h('input', { value: m.en || '', placeholder: 'English' });
+    const zh = h('input', { value: m.zh || '', placeholder: '中文' });
+    const hidden = h('input', { type: 'checkbox', checked: !!m.hidden });
+    const row = h('div.mistake-row', en, zh, h('label.check', hidden, t('hide')));
+    row.read = () => ({ key: m.key, en: en.value.trim(), zh: zh.value.trim() || en.value.trim(), ...(hidden.checked ? { hidden: true } : {}) });
+    mistakeRows.append(row);
+  };
+  s.mistakeTypes.forEach(addMistakeRow);
   const save = () => {
     const data = {
       weights: { p1: +p1.value / 100, p2: 1 - +p1.value / 100 },
       mastery: { red: +red.value, green: +green.value, minEvidence: +minEv.value, halfLifeDays: +half.value },
       cutoffs: Object.fromEntries(years.map((y) => [y, cut[y].map((i) => +i.value)])),
+      mistakeTypes: [...mistakeRows.children].map((r) => r.read()).filter((m) => m.en),
     };
     for (const [y, c] of Object.entries(data.cutoffs)) {
       if (c.some((v, i) => i && v < c[i - 1])) { toast(`${y}: cut-offs must rise from L2 to L5**`, 'err'); return; }
@@ -85,6 +97,8 @@ export function settingsView(app) {
   return h('div.page', h('h1', t('settings')),
     h('section.card', h('h2', t('weights')), h('div.grid2', field('Paper 1 %', p1), field('Paper 2 %', h('input', { disabled: true, value: 100 - s.weights.p1 * 100 })))),
     h('section.card', h('h2', t('bands')), h('div.grid4', field(`${t('red')} %`, red), field(`${t('green')} %`, green), field(t('minEvidence'), minEv), field(t('halfLife'), half))),
+    h('section.card', h('h2', t('mistakeTypesTitle')), h('p.hint', t('mistakeTypesHint')), mistakeRows,
+      h('div', h('button.small', { type: 'button', onclick: () => addMistakeRow({ key: `m${Date.now().toString(36)}` }) }, '+ ', t('add')))),
     h('section.card', h('h2', t('cutoffs')), h('div.table-wrap', cutTable)),
     h('button.primary.big', { type: 'button', onclick: save }, t('save')),
     h('section.card', h('h2', t('exportAll')), h('p.muted', t('exportHint')),

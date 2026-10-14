@@ -137,6 +137,18 @@ test('mistake split shares lost marks evenly across tags', () => {
   near(r.share.concept, 2 / 6); near(r.share.expression, 2 / 6); near(r.share.diagram, 2 / 6);
 });
 
+test('mistake split keeps tags from older lists and covers new types', () => {
+  const r = mistakeSplit(ix, [{ qid: '2022-Q1(a)', mark: 0, mistakes: ['blank'] }, { qid: '2022-Q1(b)', mark: 4, mistakes: ['retired-type'] }], ['concept', 'blank']);
+  eq(r.total, 6);
+  near(r.share.blank, 4 / 6); near(r.share['retired-type'], 2 / 6); eq(r.share.concept, 0);
+});
+
+test('default mistake types include definition and left blank', () => {
+  const keys = withDefaults().mistakeTypes.map((m) => m.key);
+  eq(keys.includes('definition') && keys.includes('blank'), true);
+  eq(withDefaults({ mistakeTypes: [{ key: 'x', en: 'X', zh: 'X' }] }).mistakeTypes.length, 1, 'settings list wins');
+});
+
 test('wrong letters are counted per MC question', () => {
   const w = wrongLetters(ix, [{ qid: '2022-P1-1', choice: 'C' }, { qid: '2022-P1-1', choice: 'C' }, { qid: '2022-P1-1', choice: 'A' }]);
   eq(w.get('2022-P1-1').C, 2);

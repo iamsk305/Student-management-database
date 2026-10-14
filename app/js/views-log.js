@@ -1,7 +1,7 @@
 // Log (or edit) an attempt: student → paper → what was done → MC keypad / LQ marks → comment → save.
-import { t, subName } from './i18n.js';
+import { t, subName, getLang } from './i18n.js';
 import { h, today, field, select, toast } from './ui.js';
-import { paperItems, itemLabel, MISTAKES } from './logic.js';
+import { paperItems, itemLabel, withDefaults } from './logic.js';
 
 const YEARS = (index) => Object.keys(index.bank.papers).map(Number).sort((a, b) => b - a);
 
@@ -133,23 +133,36 @@ function lqTable(app, st, lq) {
   };
   const rows = lq.map((it) => {
     const ans = st.answers.get(it.id) || { mistakes: [] };
-    const tags = h('div.mistakes', MISTAKES.map((k) => {
-      const b = h('button', { type: 'button', class: `chip small${ans.mistakes?.includes(k) ? ' on' : ''}`, onclick: () => {
-        const cur = st.answers.get(it.id) || { mistakes: [] };
-        const set = new Set(cur.mistakes || []);
-        set.has(k) ? set.delete(k) : set.add(k);
-        st.answers.set(it.id, { ...cur, mistakes: [...set] });
-        b.classList.toggle('on');
-      } }, t('mistake')[k]);
-      return b;
-    }));
-    const showTags = () => { const m = st.answers.get(it.id)?.mark; tags.hidden = m === undefined || m === null || m === '' || +m >= it.max; };
+    let tags;
     const input = h('input.mark', { type: 'number', min: 0, max: it.max, step: 0.5, inputMode: 'decimal', value: ans.mark ?? '',
       oninput: (e) => {
         const cur = st.answers.get(it.id) || { mistakes: [] };
         st.answers.set(it.id, { ...cur, mark: e.target.value === '' ? null : Math.min(+e.target.value, it.max) });
         showTags(); sum();
       } });
+    const types = withDefaults(app.data.settings).mistakeTypes.filter((m) => !m.hidden || ans.mistakes?.includes(m.key));
+    tags = h('div.mistakes', types.map(({ key: k, ...names }) => {
+      const b = h('button', { type: 'button', class: `chip small${ans.mistakes?.includes(k) ? ' on' : ''}`, onclick: () => {
+        const cur = st.answers.get(it.id) || { mistakes: [] };
+        const set = new Set(cur.mistakes || []);
+        set.has(k) ? set.delete(k) : set.add(k);
+        const next = { ...cur, mistakes: [...set] };
+        if (k === 'blank' && set.has(k)) { next.mark = 0; input.value = 0; sum(); }
+        st.answers.set(it.id, next);
+        b.classList.toggle('on');
+        showTags();
+      } }, names[getLang()] || names.en);
+      b.dataset.key = k;
+      return b;
+    }));
+    // No mark yet: only "Left blank" is offered. Lost marks: every reason. Full marks: none (unless already tagged).
+    const showTags = () => {
+      const a = st.answers.get(it.id);
+      const empty = a?.mark === undefined || a?.mark === null || a?.mark === '';
+      const tagged = a?.mistakes?.length > 0;
+      tags.hidden = !tagged && !empty && +a.mark >= it.max;
+      for (const c of tags.children) c.hidden = empty && !tagged && c.dataset.key !== 'blank';
+    };
     showTags();
     const subs = it.subs.map((s) => app.index.subs.get(s)).filter(Boolean);
     return h('div.lq-row',
