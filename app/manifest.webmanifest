@@ -1,0 +1,9 @@
+{
+  "name": "Kairos Student Tracker",
+  "short_name": "Kairos",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F2EFE8",
+  "theme_color": "#16294A",
+  "icons": [{ "src": "assets/mark-paper-on-navy.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

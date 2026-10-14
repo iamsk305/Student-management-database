@@ -1,0 +1,99 @@
+{
+  "topics": {
+    "B + Topic D": {
+      "relabel": {
+        "102": {"year": 2014, "q": 10},
+        "303": {"year": 2013, "q": 8}
+      },
+      "add": [
+        {"section": 1, "year": 2012, "q": 8, "key": "B",
+         "body": [
+           ["table", [["", "Firm A", "Firm B"],
+                      ["Number of owners", "2", "10"],
+                      ["Transfer of ownership", "Needs the consent of other owners", "Needs the consent of other owners"],
+                      ["Continuity", "Continues to exist when one of the owners goes bankrupt", "Will be dissolved when one of the owners goes bankrupt"]]],
+           ["stem", "According to the above table, which of the following descriptions of Firm A and Firm B is correct?"]
+         ],
+         "options": ["Firm A is at a greater risk of being taken over by another firm than Firm B.",
+                     "Firm A is a legal entity while Firm B is not.",
+                     "Both firms are subject to the same profits tax rate.",
+                     "Firm A is required to disclose its financial status to the public while Firm B is not."]},
+        {"section": 5, "year": 2022, "q": 4, "key": "D",
+         "body": [["stem", "The Government purchased the broadcasting rights of the Tokyo 2020 Olympic Games. This enabled all Hong Kong people to watch the events for free. The Olympic Games broadcast is a __________ because __________."]],
+         "options": ["public good ... the Government paid for the broadcasting rights",
+                     "private good ... one individual's consumption reduces its amount available to others",
+                     "free good ... more is not preferred",
+                     "consumer good ... it can directly satisfy human wants"]}
+      ]
+    },
+    "C": {
+      "relabel": {
+        "24": {"year": 2015, "q": 14, "key": "A"},
+        "229": {"year": 2013, "q": 13, "key": "B"},
+        "233": {"year": 2015, "q": 16}
+      }
+    },
+    "E": {
+      "relabel": {"56": {"year": 2020, "q": 22, "key": "D"}}
+    },
+    "H": {
+      "relabel": {"155": {"year": 2018, "q": 29, "key": "C"}}
+    },
+    "G": {
+      "add": [
+        {"section": 4, "year": 2020, "q": 36, "key": "C",
+         "body": [
+           ["stem", "The diagram below shows the aggregate demand curve, the short run aggregate supply curve and the long run aggregate supply curve of an economy."],
+           ["image", "dse2020_q36.png", 3.6],
+           ["stem", "Suppose the economy initially operates at E₀ and the total import value equals to the total export value. If the government decreases the amount of social security assistance for the elderly, in the short run, the deflationary (output) gap will become __________ and there will be a __________."]
+         ],
+         "options": ["narrower ... trade surplus", "narrower ... trade deficit", "wider ... trade surplus", "wider ... trade deficit"]}
+      ]
+    },
+    "I": {
+      "add": [
+        {"section": 4, "year": 2020, "q": 24, "key": "C",
+         "body": [
+           ["stem", "The following table shows the employment data of Hong Kong from April to June in 2019."],
+           ["table", [["", "Number of persons ('000)"], ["Population", "7 524"], ["Aged 15 or above", "6 590"], ["Employed persons", "3 871"], ["Unemployed persons", "114"], ["Underemployed persons", "41"]]],
+           ["stem", "According to the above data, the underemployment rate is __________."]
+         ],
+         "options": ["0.55%", "0.62%", "1.03%", "1.06%"]},
+        {"section": 8, "year": 2020, "q": 32, "key": "A",
+         "body": [["stem", "Which of the following is a contractionary monetary policy?"]],
+         "options": ["an increase in the discount rate", "an increase in the salaries tax rate", "a decrease in the required reserve ratio", "a decrease in the quota for migration"]},
+        {"section": 2, "year": 2020, "q": 34, "key": "C",
+         "body": [["stem", "When there is unexpected inflation, which of the following persons will gain?"]],
+         "options": ["a landlord who adjusts his rental according to the price index", "a creditor who has loaned out a sum of money at a floating interest rate", "an employer who signs a fixed nominal wage contract with his employees", "a retired civil servant who receives a fixed monthly pension"]},
+        {"section": 7, "year": 2020, "q": 35, "key": "B",
+         "body": [["stem", "Which of the following policies would offset the effect of an increase in the willingness to invest on the price level?"],
+                  ["stmt", "(1)", "an increase in profits tax rate"], ["stmt", "(2)", "an increase in transfer payment"], ["stmt", "(3)", "a decrease in tax allowance"]],
+         "options": ["(1) and (2) only", "(1) and (3) only", "(2) and (3) only", "(1), (2) and (3)"]},
+        {"section": 8, "year": 2020, "q": 37, "key": "D",
+         "body": [["stem", "An economist said, 'The continuous fall in stock prices in our country has already affected the consumption expenditure as well as the money demand. We should implement a policy to relieve the effects on the output level and the interest rate.' Which of the following policies can stabilise the output level and the interest rate in the country at the same time in the short run?"],
+                  ["stem", "(Assume the interest rate is mainly affected by the asset demand for money in this case.)"]],
+         "options": ["The government increases cash subsidy to the poor.", "The government gives tariff exemption to the imports of goods.", "The central bank instructs the commercial banks to tighten the requirement of personal loans.", "The central bank buys government bonds from the public."]},
+        {"section": 5, "year": 2020, "q": 38, "key": "A",
+         "body": [["stem", "In 2019, the Japanese government increases the general sales tax rate on most of the goods and services from 8% to 10%. As a result,"],
+                  ["stmt", "(1)", "income inequality will be higher."], ["stmt", "(2)", "the fiscal deficit will be eliminated."], ["stmt", "(3)", "the invisible trade deficit will decrease."]],
+         "options": ["(1) only", "(2) only", "(3) only", "(1), (2) and (3)"]},
+        {"section": 5, "year": 2020, "q": 39, "key": "D",
+         "body": [["stem", "The following is an extract of the mission of the Inland Revenue Department."],
+                  ["table", [["Our Mission"], ["We are committed to"], ["- collecting revenue efficiently and cost-effectively"], ["- enabling staff to acquire the necessary knowledge, skills and attitude so that they can contribute their best to the achievement of our vision"]]],
+                  ["stem", "The above mission is in line with the __________ principle of taxation put forward by Adam Smith."]],
+         "options": ["equality", "certainty", "convenience", "economy"]},
+        {"section": 5, "year": 2020, "q": 40, "key": "A",
+         "body": [["stem", "Mr. Chan runs a factory in mainland China and earns a huge profit. Recently he has bought a flat and a second hand electric car in Hong Kong, and received dividends from his shares of HSBC."],
+                  ["stem", "According to the above information, which type(s) of tax does he need to pay to the Hong Kong government?"],
+                  ["stmt", "(1)", "Property tax"], ["stmt", "(2)", "Stamp duty"], ["stmt", "(3)", "Profits tax"], ["stmt", "(4)", "First registration tax"]],
+         "options": ["(2) only", "(1) and (4) only", "(2) and (3) only", "(1), (3) and (4) only"]},
+        {"section": 5, "year": 2020, "q": 41, "key": "C",
+         "body": [["stem", "In the case WITHOUT tax exemption, John needs to pay $15 000 and Mary needs to pay $35 000 as income tax."],
+                  ["stem", "Suppose the government proposes the following income tax exemption measures:"],
+                  ["table", [["", "Amount of tax exemption"], ["Measure I", "75% of income tax, maximum $30 000"], ["Measure II", "100% of income tax, maximum $20 000"]]],
+                  ["stem", "John will prefer __________ while Mary will prefer __________."]],
+         "options": ["measure I ... measure I", "measure I ... measure II", "measure II ... measure I", "measure II ... measure II"]}
+      ]
+    }
+  }
+}
