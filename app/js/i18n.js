@@ -49,7 +49,10 @@ const STRINGS = {
     mistake: { concept: 'Concept wrong', misapplied: 'Misapplied', expression: 'Weak expression', diagram: 'Diagram error', incomplete: 'Incomplete / time' },
     // family page
     familyTitle: 'Progress report', familyIntro: 'Updated after every marked paper.', ppRecord: 'Past-paper record',
-    tutorComment: 'Tutor’s comment', linkInvalid: 'This link is not valid. Please ask your tutor for a new one.',
+    report: 'Report', reportTitle: 'Progress report', reportPeriod: 'Period', from: 'From', to: 'To', makePdf: 'Create PDF',
+    making: 'Creating PDF…', reportLang: 'Report language', papersInPeriod: 'Past papers in this period',
+    noneInPeriod: 'No past papers logged in this period.', asOf: (d) => `as of ${d}`, preparedBy: 'Prepared by Lawrence · Kairos｜DSE 經濟',
+    tutorComment: 'Tutor’s comment', linkInvalid: 'This page is not available.',
   },
   zh: {
     appName: '學生進度', home: '主頁', students: '學生', log: '記錄練習', classView: '全班', bank: '題庫',
@@ -88,7 +91,10 @@ const STRINGS = {
     bankBuilt: (d) => `題庫於 ${d} 由 Word 檔匯出。`,
     mistake: { concept: '概念錯', misapplied: '應用錯', expression: '表達弱', diagram: '圖錯', incomplete: '未完成／夠鐘' },
     familyTitle: '學習進度報告', familyIntro: '每份改好嘅試卷都會即時更新。', ppRecord: '歷屆試題紀錄',
-    tutorComment: '導師評語', linkInvalid: '連結無效，請向導師索取新連結。',
+    report: '報告', reportTitle: '學習進度報告', reportPeriod: '報告期間', from: '由', to: '至', makePdf: '製作 PDF',
+    making: '製作中…', reportLang: '報告語言', papersInPeriod: '期間內完成嘅歷屆試題',
+    noneInPeriod: '期間內未有歷屆試題紀錄。', asOf: (d) => `截至 ${d}`, preparedBy: '導師 Lawrence · Kairos｜DSE 經濟',
+    tutorComment: '導師評語', linkInvalid: '此頁面暫不開放。',
   },
 };
 
@@ -106,6 +112,12 @@ export function initLang(fallback, key = 'kairos-lang') {
   KEY = key;
   try { lang = localStorage.getItem(KEY) || fallback || lang; } catch { lang = fallback || lang; }
   document.documentElement.lang = lang === 'zh' ? 'zh-HK' : 'en';
+}
+/** Run fn with another language active, without touching the saved preference (used for PDF reports). */
+export async function withLang(l, fn) {
+  const before = lang;
+  lang = l;
+  try { return await fn(); } finally { lang = before; }
 }
 export const t = (key) => STRINGS[lang][key] ?? STRINGS.en[key] ?? key;
 export const subName = (sub) => (sub ? sub[lang] || sub.en : '');

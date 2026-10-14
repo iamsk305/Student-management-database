@@ -219,3 +219,26 @@ dialog.modal::backdrop { background: rgba(12, 22, 38, .45); }
   .bar-row { grid-template-columns: 7rem 1fr 2.6rem; }
 }
 @media print { .top, .tabs, button, .button { display: none !important; } body { background: #fff; } .card { box-shadow: none; } }
+
+/* PDF report pages (rendered off-screen, captured to PDF) — always light, A4 at 96 dpi */
+.report-holder { position: fixed; left: -10000px; top: 0; }
+.report-page { --ground: #FFFFFF; --surface: #FFFFFF; --ink: #16294A; --ink-soft: #4A5B77; --ink-faint: #7C8AA1;
+  --line: rgba(22, 41, 74, .14); --line-strong: rgba(22, 41, 74, .30); --grey-bg: #EEEBE4;
+  --red: #B4483A; --red-bg: #F4DCD7; --amber: #B7832A; --amber-bg: #F5E6C8; --green: #3E7D57; --green-bg: #D9EBDF; --signal: #9C6B22;
+  width: 794px; height: 1123px; padding: 48px; background: #fff; color: var(--ink); font: 14px/1.45 var(--font);
+  display: flex; flex-direction: column; overflow: hidden; color-scheme: light; }
+.report-page .r-body { display: flex; flex-direction: column; gap: 14px; }
+.report-page .r-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #16294A; padding-bottom: 12px; }
+.report-page .r-head img { height: 40px; }
+.report-page .r-title { text-align: right; } .report-page .r-title h1 { font-size: 20px; } .report-page .r-title p { margin: 0; color: var(--ink-soft); }
+.report-page .r-student h2 { font-size: 22px; margin: 0; }
+.report-page .r-levels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: #F7F5F0; border-radius: 10px; padding: 14px 18px; }
+.report-page .big { font-size: 34px; }
+.report-page h3, .report-page .r-h { font-size: 15px; margin: 4px 0 6px; font-weight: 600; }
+.report-page .r-paper { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report-page .comment { margin-top: 6px; }
+.report-page .chart svg { max-height: 230px; }
+.report-page .map { gap: 6px; } .report-page .map-row { grid-template-columns: 170px 1fr; }
+.report-page .chip { font-size: 11px; padding: 3px 6px; }
+.report-page .r-foot { margin-top: auto; display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-faint); border-top: 1px solid var(--line); padding-top: 8px; }
+.report-page .chip-name { display: inline; }

@@ -1,13 +1,14 @@
 # Kairos Student Tracker
 
-Past-paper tracking for Kairos｜DSE 經濟: per-question logging, A–J syllabus map, predicted level, private family pages.
+Past-paper tracking for Kairos｜DSE 經濟: per-question logging, A–J syllabus map, predicted level, PDF progress reports.
+Only Lawrence uses the app; parents get a PDF (student page → ⤓ Report → dates + language → share to WhatsApp).
 Static web app (`app/`) on GitHub Pages + Supabase (database + login). No build step.
 
 ## Folders
 
 | Path | What |
 | --- | --- |
-| `app/` | The website. `index.html` = admin app, `family.html` = family page |
+| `app/` | The website. `index.html` = the app, `family.html` = family page (switched off, see below) |
 | `app/data/bank.json` | Question bank exported from the Word booklets — regenerate, don't edit |
 | `supabase/schema.sql` | Database tables, security rules, family function. Safe to re-run |
 | `supabase/seed-my-students.sql` | One-time import of current students (private — not committed) |
@@ -34,6 +35,11 @@ Static web app (`app/`) on GitHub Pages + Supabase (database + login). No build 
 - **Predicted level** — timed full papers only; each paper is placed on its own year's cut-offs, newest three weighted 3 : 2 : 1.
 - **Sub-topic mastery** — share of marks earned, older work counting less (half weight after 60 days). Under 6 marks of evidence shows as an outline.
 - **"Not in topic bank"** — P2 marks on questions the by-topic booklets don't cover (mostly the final multi-topic question). They count toward the paper score but not the map.
+
+## Family links (switched off)
+
+The read-only family page is kept but off: `FAMILY_LINKS = false` in `app/js/config.js`, and
+`supabase/family-links-off.sql` blocks it in the database. To bring it back, set `true` and run `family-links-on.sql`.
 
 ## Security
 

@@ -5,7 +5,7 @@ import { attemptScore, mastery, predictLevel, mistakeSplit, nextPractice, itemLa
  * attempts: [{id, date, year, paper, scope, timed, ...}], responses: [{attempt_id, qid, ...}]
  * taughtSubs: iterable of sub ids from lessons; overrides: {sub: state} or Map.
  */
-export function studentView(index, { student, attempts, responses, taughtSubs = [], overrides = {}, settings }) {
+export function studentView(index, { student, attempts, responses, taughtSubs = [], overrides = {}, settings, now = Date.now() }) {
   const s = withDefaults(settings);
   const byAttempt = new Map();
   for (const r of responses) {
@@ -18,7 +18,7 @@ export function studentView(index, { student, attempts, responses, taughtSubs = 
       return { ...a, ...sc, responses: byAttempt.get(a.id) || [], label: attemptLabel(a) };
     })
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-  const masteryMap = mastery(index, attempts, byAttempt, s);
+  const masteryMap = mastery(index, attempts, byAttempt, s, now);
   const ov = overrides instanceof Map ? overrides : new Map(Object.entries(overrides || {}));
   const taught = new Set(taughtSubs);
   for (const [sub, st] of ov) if (st !== 'untaught') taught.add(sub);

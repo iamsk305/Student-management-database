@@ -5,6 +5,7 @@ import { indexBank, levelName, levelValue } from './logic.js';
 import { studentView } from './model.js';
 import { t, getLang, setLang, initLang } from './i18n.js';
 import { h, fmtDate, pct, trendChart, syllabusMap } from './ui.js';
+import { FAMILY_LINKS } from './config.js';
 
 const params = new URLSearchParams(location.hash.slice(1));
 const token = params.get('t');
@@ -20,7 +21,7 @@ async function boot() {
     const { demoSeed } = await import('./demo.js');
     store = demoStore(demoSeed(bankIndex));
   } else store = supabaseStore();
-  data = token ? await store.family(token) : null;
+  data = token && (FAMILY_LINKS || isDemo) ? await store.family(token) : null;
   render();
 }
 

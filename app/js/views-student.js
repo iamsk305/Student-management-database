@@ -3,6 +3,8 @@ import { t, subName } from './i18n.js';
 import { h, fmtDate, today, pct, modal, field, select, toast, trendChart, syllabusMap, STATES } from './ui.js';
 import { MISTAKES, levelName, levelValue, itemLabel } from './logic.js';
 import { newToken } from './store.js';
+import { FAMILY_LINKS } from './config.js';
+import { reportDialog } from './report.js';
 
 const TABS = ['overview', 'map', 'attempts', 'lessons', 'homework', 'school', 'profile'];
 const TAB_LABEL = { overview: 'overview', map: 'map', attempts: 'attempts', lessons: 'lessons', homework: 'homework', school: 'schoolResults', profile: 'profile' };
@@ -18,7 +20,8 @@ export function studentPage(app, id, tab) {
   return h('div.page',
     h('div.page-head',
       h('div', h('h1', s.name), h('p.muted', [s.form, s.school, s.elective ? `${t('elective')} ${s.elective.replace('E', '')}` : null, s.status].filter(Boolean).join(' · '))),
-      h('a.button.primary', { href: `#/log/${id}` }, '+ ', t('log'))),
+      h('div.row', h('button', { type: 'button', onclick: () => reportDialog(app, id) }, '⤓ ', t('report')),
+        h('a.button.primary', { href: `#/log/${id}` }, '+ ', t('log')))),
     h('nav.tabs', TABS.map((k) => h('a', { href: `#/s/${id}/${k}`, class: k === tab ? 'on' : '' }, t(TAB_LABEL[k])))),
     body(app, s, v));
 }
@@ -51,7 +54,7 @@ function overview(app, s, v) {
     }) : h('p.muted', t('allClear')));
 
   return h('div.stack',
-    h('div.grid2', levelCard, familyCard(app, s)),
+    FAMILY_LINKS ? h('div.grid2', levelCard, familyCard(app, s)) : levelCard,
     h('section.card', h('h2', t('trend')), trendChart(v.attempts, v.settings)),
     h('div.grid2', mistakes, next));
 }
