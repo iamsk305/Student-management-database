@@ -50,6 +50,15 @@ export function withDefaults(settings) {
   };
 }
 
+/**
+ * Sub-topics Lawrence has taught a student. Until edited by hand (students.my_subs is null) this follows the lesson
+ * records; once edited, my_subs is the list, and lessons saved later add their sub-topics to it.
+ */
+export function mySubs(student, lessons) {
+  if (Array.isArray(student?.my_subs)) return student.my_subs;
+  return [...new Set(lessons.filter((l) => l.student_id === student?.id).flatMap((l) => l.subs || []))];
+}
+
 // ---------- bank lookups ----------
 
 /** Marks on each year's old single "not in topic bank" line (bank of 14 Oct 2026, before those parts were tagged). */

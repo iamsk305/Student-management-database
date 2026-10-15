@@ -1,7 +1,7 @@
 // One student: overview, syllabus map, PP record, lessons, homework, school results, profile.
 import { t, subName } from './i18n.js';
 import { h, fmtDate, today, pct, modal, field, select, toast, trendChart, syllabusMap, STATES, mistakeBars, gradeLabel, subChips } from './ui.js';
-import { levelName, levelValue, itemLabel, masteryState } from './logic.js';
+import { levelName, levelValue, itemLabel, masteryState, mySubs } from './logic.js';
 import { newToken } from './store.js';
 import { FAMILY_LINKS } from './config.js';
 import { reportDialog } from './report.js';
@@ -81,23 +81,25 @@ function mapTab(app, s, v) {
   const cover = (set) => (sub) => h('span', { class: `chip ${set.has(sub.id) ? 's-covered' : 's-untaught'}`, title: `${sub.id} ${subName(sub)}` },
     h('span.chip-id', sub.id), h('span.chip-name', subName(sub)));
 
-  // 1. what Lawrence has taught (from lesson records)
-  const mine = new Set(app.data.lessons.filter((l) => l.student_id === s.id).flatMap((l) => l.subs || []));
-  const mineCard = h('section.card', h('h2', t('mapMine'), count(mine)), h('p.hint', t('mapMineHint')),
-    subChips(app.index, { hide, chip: cover(mine) }));
-
-  // 2. what school has taught (ticked off by hand)
-  const school = new Set(s.school_subs || []);
-  const editSchool = async () => {
-    const subs = await modal(t('mapSchool'), (close) => {
-      const picker = subPicker(app.index, [...school], hide);
-      return h('div.stack', picker, h('button.primary', { type: 'button', onclick: () => close(picker.value()) }, t('save')));
+  // Tick sub-topics in a picker; "All" / "None" for a whole-syllabus start. Saves to one students column.
+  const editCard = (title, set, column) => async () => {
+    const subs = await modal(title, (close) => {
+      let picker = subPicker(app.index, [...set], hide);
+      const swap = (ids) => { const p = subPicker(app.index, ids, hide); picker.replaceWith(p); picker = p; };
+      return h('div.stack',
+        h('div.row', h('button.small', { type: 'button', onclick: () => swap(allSubs.map((x) => x.id)) }, t('tickAll')),
+          h('button.small', { type: 'button', onclick: () => swap([]) }, t('tickNone'))),
+        picker, h('button.primary', { type: 'button', onclick: () => close(picker.value()) }, t('save')));
     });
-    if (subs) app.mutate((st) => st.update('students', s.id, { school_subs: subs }));
+    if (subs) app.mutate((st) => st.update('students', s.id, { [column]: subs }));
   };
-  const schoolCard = h('section.card',
-    h('div.row.spread', h('h2', t('mapSchool'), count(school)), h('button.small', { type: 'button', onclick: editSchool }, t('edit'))),
-    h('p.hint', t('mapSchoolHint')), subChips(app.index, { hide, chip: cover(school) }));
+  const coverCard = (title, hint, set, column) => h('section.card',
+    h('div.row.spread', h('h2', title, count(set)), h('button.small', { type: 'button', onclick: editCard(title, set, column) }, t('edit'))),
+    h('p.hint', hint), subChips(app.index, { hide, chip: cover(set) }));
+
+  // 1. what Lawrence has taught (lesson records until edited by hand)  2. what school has taught (ticked by hand)
+  const mineCard = coverCard(t('mapMine'), t('mapMineHint'), new Set(mySubs(s, app.data.lessons)), 'my_subs');
+  const schoolCard = coverCard(t('mapSchool'), t('mapSchoolHint'), new Set(s.school_subs || []), 'school_subs');
 
   // 3. how they are doing now: only sub-topics with past-paper work, weakest first on top
   const states = new Map(allSubs.map((sub) => [sub.id, masteryState(sub.id, v.mastery.get(sub.id), v.taught, v.overrides, v.settings)]));
@@ -181,7 +183,12 @@ function lessonsTab(app, s) {
         h('div.grid2', field(t('date'), date), field(t('minutes'), minutes)), field(t('covered'), subs), field(t('note'), note),
         h('button.primary', { type: 'submit' }, t('save')));
     });
-    if (row) app.mutate((st) => (l.id ? st.update('lessons', l.id, row) : st.insert('lessons', row)));
+    if (row) app.mutate(async (st) => {
+      const out = await (l.id ? st.update('lessons', l.id, row) : st.insert('lessons', row));
+      const add = row.subs.filter((x) => !s.my_subs?.includes(x));
+      if (Array.isArray(s.my_subs) && add.length) await st.update('students', s.id, { my_subs: [...s.my_subs, ...add] });
+      return out;
+    });
   };
   return h('div.stack',
     h('div', h('button.primary', { type: 'button', onclick: () => edit() }, '+ ', t('addLesson'))),

@@ -2,7 +2,7 @@
 // (jsc = macOS JavaScriptCore: /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc)
 import {
   indexBank, paperItems, markMC, attemptScore, levelValue, levelName, predictLevel, mastery, masteryState,
-  mistakeSplit, wrongLetters, nextPractice, itemLabel, DEFAULT_CUTOFFS, withDefaults,
+  mistakeSplit, wrongLetters, nextPractice, itemLabel, DEFAULT_CUTOFFS, withDefaults, mySubs,
 } from '../app/js/logic.js';
 
 let passed = 0, failed = 0;
@@ -171,6 +171,13 @@ test('careless replaces misapplied, including on lists saved earlier', () => {
   eq(vis(old).join(), 'concept,careless,blank');
   const later = { mistakeTypes: [{ key: 'careless', en: 'X', zh: 'X', hidden: true }, { key: 'misapplied', en: 'M', zh: 'M' }] };
   eq(vis(later).join(), 'misapplied', 'once careless exists, Settings decides');
+});
+
+test('taught in lessons follows lesson records until edited by hand', () => {
+  const lessons = [{ student_id: 'a', subs: ['C.1'] }, { student_id: 'a', subs: ['C.1', 'C.6'] }, { student_id: 'b', subs: ['A.1'] }];
+  eq(mySubs({ id: 'a' }, lessons).join(), 'C.1,C.6');
+  eq(mySubs({ id: 'a', my_subs: ['A.2'] }, lessons).join(), 'A.2', 'hand-edited list wins');
+  eq(mySubs({ id: 'a', my_subs: [] }, lessons).length, 0, 'unticking everything sticks');
 });
 
 test('wrong letters are counted per MC question', () => {

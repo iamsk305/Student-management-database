@@ -11,7 +11,7 @@ Static web app (`app/`) on GitHub Pages + Supabase (database + login). No build 
 | `app/` | The website. `index.html` = the app, `family.html` = family page (switched off, see below) |
 | `app/data/bank.json` | Question bank exported from the Word booklets — regenerate, don't edit |
 | `supabase/schema.sql` | Database tables, security rules, family function. Safe to re-run |
-| `supabase/add-school-subs.sql` | One-off (15 Oct 2026): adds “taught at school” to students. Run once in the SQL Editor |
+| `supabase/f6-taught-all.sql` | One-off (15 Oct 2026): adds the two “taught” lists to students and marks every current F6 student as taught everything. Run once in the SQL Editor |
 | `supabase/seed-my-students.sql` | One-time import of current students (private — not committed) |
 | `tools/build_bank.py` | Word booklets → `bank.json` |
 | `tools/fix_mc_bank.py`, `build_elective.py` | The Oct 2026 MC fixes and elective booklets (kept for reference) |

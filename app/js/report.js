@@ -3,7 +3,7 @@
 // each page is captured with html2canvas and placed into a jsPDF document. Libraries load only when a report is made.
 import { t, subName, withLang, getLang } from './i18n.js';
 import { h, fmtDate, pct, today, modal, field, select, toast, trendChart, syllabusMap, mistakeBars, gradeLabel } from './ui.js';
-import { levelName, levelValue, itemLabel, mistakeSplit, withDefaults } from './logic.js';
+import { levelName, levelValue, itemLabel, mistakeSplit, withDefaults, mySubs } from './logic.js';
 import { studentView } from './model.js';
 
 const PAGE_W = 794, PAGE_H = 1123, PAD = 48; // A4 at 96 dpi
@@ -33,7 +33,7 @@ export function reportData(app, studentId, from, to) {
     student: app.student(studentId),
     attempts,
     responses,
-    taughtSubs: d.lessons.filter((l) => l.student_id === studentId && l.date <= to).flatMap((l) => l.subs || []),
+    taughtSubs: mySubs(app.student(studentId), d.lessons.filter((l) => l.date <= to)),
     overrides: Object.fromEntries(d.mastery_overrides.filter((o) => o.student_id === studentId).map((o) => [o.sub, o.state])),
     settings: d.settings,
     now: Date.parse(end),

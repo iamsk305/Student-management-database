@@ -1,6 +1,6 @@
 // Admin app shell: login, data loading, routing, header. Views live in views-*.js.
 import { supabaseStore, demoStore } from './store.js';
-import { indexBank } from './logic.js';
+import { indexBank, mySubs } from './logic.js';
 import { studentView } from './model.js';
 import { t, getLang, setLang, initLang } from './i18n.js';
 import { h, toast, today, fmtDate } from './ui.js';
@@ -29,7 +29,7 @@ export const app = {
         student: this.student(id),
         attempts,
         responses: d.responses.filter((r) => ids.has(r.attempt_id)),
-        taughtSubs: d.lessons.filter((l) => l.student_id === id).flatMap((l) => l.subs || []),
+        taughtSubs: mySubs(this.student(id), d.lessons),
         overrides: Object.fromEntries(d.mastery_overrides.filter((o) => o.student_id === id).map((o) => [o.sub, o.state])),
         settings: d.settings,
       }));
