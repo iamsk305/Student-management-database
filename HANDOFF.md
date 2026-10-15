@@ -17,12 +17,14 @@ Read this first in a new chat, then README.md.
 - Haywood 2022 recorded as P1 40/44, P2 65/120 (as on the script).
 - Mistake reasons are editable in Settings; added "Definition not memorised", "Left blank" and (15 Oct, another session) "Careless mistake"; "Misapplied" retired.
 - 15 Oct (another session): old "not in topic bank" lines on saved attempts are split back into the tagged Paper 2 parts.
+- 15 Oct (another session): school predicted grades shown as "L3" like the app's own. Syllabus map tab is now three cards: taught in my lessons / taught at school (ticked by hand, `students.school_subs`) / past-paper performance (weakest five on top). School-taught topics count as taught for next practice.
 - Paper 2 questions missing from the topic booklets were tagged by Claude (list `EXTRA` in `tools/build_bank.py`); every year's P2 is now fully covered.
 
 ## Not yet confirmed by Lawrence
 - [ ] Created the login user in Supabase and ran `supabase/seed-my-students.sql` (6 students + Haywood's paper)
 - [ ] Ran `supabase/family-links-off.sql`
 - [ ] Set Supabase Authentication → URL Configuration → Site URL to the live app link
+- [ ] Ran `supabase/add-school-subs.sql` in the SQL Editor (needed before "Taught at school" can be saved)
 - [ ] Logged one real paper on the live site to check the latest changes
 
 ## Open items
