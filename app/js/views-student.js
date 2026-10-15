@@ -1,7 +1,7 @@
 // One student: overview, syllabus map, PP record, lessons, homework, school results, profile.
 import { t, subName } from './i18n.js';
-import { h, fmtDate, today, pct, modal, field, select, toast, trendChart, syllabusMap, STATES, mistakeBars } from './ui.js';
-import { levelName, levelValue, itemLabel } from './logic.js';
+import { h, fmtDate, today, pct, modal, field, select, toast, trendChart, syllabusMap, STATES, mistakeBars, gradeLabel, subChips } from './ui.js';
+import { levelName, levelValue, itemLabel, masteryState } from './logic.js';
 import { newToken } from './store.js';
 import { FAMILY_LINKS } from './config.js';
 import { reportDialog } from './report.js';
@@ -34,7 +34,7 @@ function overview(app, s, v) {
     h('div', h('span.label', t('predicted')),
       v.predicted ? h('div.big', `L${v.predicted.level}`, h('small', ` ${v.predicted.value.toFixed(1)}`)) : h('div.big.muted', '—'),
       h('span.hint', v.predicted ? t('basedOn')(v.predicted.basedOn) : t('noPrediction'))),
-    h('div', h('span.label', t('schoolPredicted')), h('div.big', school ? school.predicted_grade : '—'),
+    h('div', h('span.label', t('schoolPredicted')), h('div.big', school ? gradeLabel(school.predicted_grade) : '—'),
       h('span.hint', school ? `${school.exam} · ${fmtDate(school.date)}` : '')));
 
   const mis = v.mistakes;
@@ -76,16 +76,56 @@ function familyCard(app, s) {
 
 function mapTab(app, s, v) {
   const hide = new Set(['E1', 'E2'].filter((e) => s.elective && e !== s.elective));
-  return h('section.card', syllabusMap(app.index, v.mastery, v.taught, v.overrides, v.settings, {
-    hide,
-    onPick: async (sub, st) => {
-      const choice = await modal(`${sub.id} ${subName(sub)}`, (close) => h('div.stack',
-        h('p.muted', st.manual ? t('setByTutor') : ''),
-        h('div.chip-picker', STATES.map((k) => h('button', { type: 'button', class: `chip s-${k}${st.state === k ? ' on' : ''}`, onclick: () => close(k) }, t('mapLegend')[k]))),
-        st.manual ? h('button.link', { type: 'button', onclick: () => close('') }, t('clearOverride')) : null));
-      if (choice !== undefined) app.mutate((store) => store.setOverride(s.id, sub.id, choice || null));
-    },
-  }));
+  const allSubs = app.index.bank.topics.filter((tp) => !hide.has(tp.code)).flatMap((tp) => tp.subtopics);
+  const count = (set) => h('span.muted', ` ${allSubs.filter((x) => set.has(x.id)).length} / ${allSubs.length}`);
+  const cover = (set) => (sub) => h('span', { class: `chip ${set.has(sub.id) ? 's-covered' : 's-untaught'}`, title: `${sub.id} ${subName(sub)}` },
+    h('span.chip-id', sub.id), h('span.chip-name', subName(sub)));
+
+  // 1. what Lawrence has taught (from lesson records)
+  const mine = new Set(app.data.lessons.filter((l) => l.student_id === s.id).flatMap((l) => l.subs || []));
+  const mineCard = h('section.card', h('h2', t('mapMine'), count(mine)), h('p.hint', t('mapMineHint')),
+    subChips(app.index, { hide, chip: cover(mine) }));
+
+  // 2. what school has taught (ticked off by hand)
+  const school = new Set(s.school_subs || []);
+  const editSchool = async () => {
+    const subs = await modal(t('mapSchool'), (close) => {
+      const picker = subPicker(app.index, [...school], hide);
+      return h('div.stack', picker, h('button.primary', { type: 'button', onclick: () => close(picker.value()) }, t('save')));
+    });
+    if (subs) app.mutate((st) => st.update('students', s.id, { school_subs: subs }));
+  };
+  const schoolCard = h('section.card',
+    h('div.row.spread', h('h2', t('mapSchool'), count(school)), h('button.small', { type: 'button', onclick: editSchool }, t('edit'))),
+    h('p.hint', t('mapSchoolHint')), subChips(app.index, { hide, chip: cover(school) }));
+
+  // 3. how they are doing now: only sub-topics with past-paper work, weakest first on top
+  const states = new Map(allSubs.map((sub) => [sub.id, masteryState(sub.id, v.mastery.get(sub.id), v.taught, v.overrides, v.settings)]));
+  const done = (sub) => v.mastery.has(sub.id) || states.get(sub.id).manual;
+  const onPick = async (sub, st) => {
+    const choice = await modal(`${sub.id} ${subName(sub)}`, (close) => h('div.stack',
+      h('p.muted', st.manual ? t('setByTutor') : ''),
+      h('div.chip-picker', STATES.map((k) => h('button', { type: 'button', class: `chip s-${k}${st.state === k ? ' on' : ''}`, onclick: () => close(k) }, t('mapLegend')[k]))),
+      st.manual ? h('button.link', { type: 'button', onclick: () => close('') }, t('clearOverride')) : null));
+    if (choice !== undefined) app.mutate((store) => store.setOverride(s.id, sub.id, choice || null));
+  };
+  const ppChip = (sub) => {
+    const st = states.get(sub.id), m = v.mastery.get(sub.id);
+    const detail = [`${sub.id} ${subName(sub)}`, st.pct != null ? pct(st.pct) : null, m ? t('marksOf')(m.evidence) : null, st.manual ? t('setByTutor') : null];
+    return h('button', { type: 'button', class: `chip s-${st.state}${st.manual ? ' manual' : ''}`, title: detail.filter(Boolean).join(' · '), onclick: () => onPick(sub, st) },
+      h('span.chip-id', sub.id), h('span.chip-name', subName(sub)), st.pct != null && st.state !== 'untaught' ? h('span.chip-pct', pct(st.pct)) : null);
+  };
+  const weakest = allSubs.filter((sub) => ['red', 'amber'].includes(states.get(sub.id).state) && states.get(sub.id).pct != null)
+    .sort((a, b) => states.get(a.id).pct - states.get(b.id).pct).slice(0, 5);
+  const ppDone = allSubs.filter(done);
+  const ppCard = h('section.card', h('h2', t('mapPP'), h('span.muted', ` ${ppDone.length} / ${allSubs.length}`)), h('p.hint', t('mapPPHint')),
+    ppDone.length ? [
+      weakest.length ? h('div.weakest', h('span.label', t('mapWeakest')), weakest.map(ppChip)) : null,
+      h('div.legend.map-legend', STATES.filter((k) => k !== 'untaught').map((k) => h(`span.k.s-${k}`, t('mapLegend')[k]))),
+      subChips(app.index, { hide, only: done, chip: ppChip }),
+    ] : h('p.muted', t('noAttempts')));
+
+  return h('div.stack', mineCard, schoolCard, ppCard);
 }
 
 // ---------- attempts ----------
@@ -188,7 +228,7 @@ function schoolTab(app, s) {
       const date = h('input', { type: 'date', value: r.date || today() });
       const mark = h('input', { type: 'number', step: 0.5, value: r.mark ?? '' });
       const max = h('input', { type: 'number', step: 0.5, value: r.max ?? 100 });
-      const grade = select([['', '—'], ...['1', '2', '3', '4', '5', '5*', '5**'].map((g) => [g, g])], r.predicted_grade);
+      const grade = select([['', '—'], ...['1', '2', '3', '4', '5', '5*', '5**'].map((g) => [g, gradeLabel(g)])], r.predicted_grade);
       return h('form.stack', { onsubmit: (e) => { e.preventDefault(); close({ student_id: s.id, exam: exam.value, date: date.value || null,
         mark: mark.value === '' ? null : +mark.value, max: max.value === '' ? null : +max.value, predicted_grade: grade.value || null }); } },
       field(t('exam'), exam), field(t('date'), date), h('div.grid2', field(t('mark'), mark), field(t('outOf'), max)),
@@ -202,7 +242,7 @@ function schoolTab(app, s) {
       h('thead', h('tr', [t('date'), t('exam'), t('mark'), t('predictedGrade'), ''].map((x) => h('th', x)))),
       h('tbody', rows.map((r) => h('tr',
         h('td', fmtDate(r.date)), h('td', r.exam), h('td', r.mark != null ? `${r.mark}${r.max ? ' / ' + r.max : ''}` : '—'),
-        h('td', r.predicted_grade || '—'),
+        h('td', gradeLabel(r.predicted_grade)),
         h('td.row', h('button.small', { type: 'button', onclick: () => edit(r) }, t('edit')),
           h('button.small.danger', { type: 'button', onclick: () => { if (confirm(t('confirmDelete'))) app.mutate((st) => st.remove('school_results', r.id)); } }, t('delete')))))))) : h('p.muted', t('none')));
 }

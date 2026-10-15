@@ -4,7 +4,7 @@ import { supabaseStore, demoStore } from './store.js';
 import { indexBank, levelName, levelValue } from './logic.js';
 import { studentView } from './model.js';
 import { t, getLang, setLang, initLang } from './i18n.js';
-import { h, fmtDate, pct, trendChart, syllabusMap } from './ui.js';
+import { h, fmtDate, pct, trendChart, syllabusMap, gradeLabel } from './ui.js';
 import { FAMILY_LINKS } from './config.js';
 
 const params = new URLSearchParams(location.hash.slice(1));
@@ -54,7 +54,7 @@ function render() {
         h('div', h('span.label', t('predicted')),
           v.predicted ? h('div.big', `L${v.predicted.level}`) : h('div.big.muted', '—'),
           h('span.hint', v.predicted ? t('basedOn')(v.predicted.basedOn) : t('noPrediction'))),
-        h('div', h('span.label', t('schoolPredicted')), h('div.big', school ? school.predicted_grade : '—'),
+        h('div', h('span.label', t('schoolPredicted')), h('div.big', school ? gradeLabel(school.predicted_grade) : '—'),
           h('span.hint', school ? `${school.exam} · ${fmtDate(school.date)}` : ''))),
       h('section.card', h('h2', t('trend')), trendChart(v.attempts, v.settings))),
     h('section.card', h('h2', t('map')), syllabusMap(bankIndex, v.mastery, v.taught, v.overrides, v.settings, { hide })),

@@ -20,11 +20,14 @@ create table if not exists students (
   parent_name text,
   parent_phone text,
   notes text,
+  school_subs text[] not null default '{}',  -- sub-topics the school has taught (ticked on the syllabus map)
   family_token text unique not null default replace(replace(replace(encode(gen_random_bytes(24), 'base64'), '+', '-'), '/', '_'), '=', ''),
   -- billing fields: empty until Finance-Tracker-v2 merges in
   format text, rate_basis text, rate numeric, lesson_hours numeric,
   created_at timestamptz not null default now()
 );
+-- added 15 Oct 2026; for databases made before then
+alter table students add column if not exists school_subs text[] not null default '{}';
 
 create table if not exists attempts (
   id uuid primary key default gen_random_uuid(),

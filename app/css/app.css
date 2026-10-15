@@ -153,6 +153,10 @@ table.cutoffs input { width: 4.2rem; padding: .3rem .4rem; }
 button.chip { cursor: pointer; }
 .chip-id { font-weight: 600; } .chip-pct { font-size: .75rem; opacity: .8; }
 .chip.s-untaught { background: var(--grey-bg); color: var(--ink-faint); }
+.chip.s-covered { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.weakest { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin-bottom: .75rem; }
+.weakest .label { margin-right: .25rem; }
+.weakest .chip-name { display: inline; }
 .chip.s-thin { background: transparent; border-color: var(--line-strong); }
 .chip.s-red { background: var(--red-bg); border-color: var(--red); }
 .chip.s-amber { background: var(--amber-bg); border-color: var(--amber); }

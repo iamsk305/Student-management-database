@@ -3,7 +3,7 @@ import { attemptScore, mastery, predictLevel, mistakeSplit, nextPractice, itemLa
 
 /**
  * attempts: [{id, date, year, paper, scope, timed, ...}], responses: [{attempt_id, qid, ...}]
- * taughtSubs: iterable of sub ids from lessons; overrides: {sub: state} or Map.
+ * taughtSubs: iterable of sub ids from lessons (the student's school_subs are added); overrides: {sub: state} or Map.
  */
 export function studentView(index, { student, attempts, responses, taughtSubs = [], overrides = {}, settings, now = Date.now() }) {
   const s = withDefaults(settings);
@@ -20,7 +20,7 @@ export function studentView(index, { student, attempts, responses, taughtSubs = 
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
   const masteryMap = mastery(index, attempts, byAttempt, s, now);
   const ov = overrides instanceof Map ? overrides : new Map(Object.entries(overrides || {}));
-  const taught = new Set(taughtSubs);
+  const taught = new Set([...taughtSubs, ...(student?.school_subs || [])]); // taught by Lawrence or at school
   for (const [sub, st] of ov) if (st !== 'untaught') taught.add(sub);
   const attempted = new Set(responses.map((r) => r.qid));
   return {

@@ -24,6 +24,10 @@ const STRINGS = {
     mistakeNone: 'No mistakes tagged yet.', fullPaper: 'Full paper', section: 'Section / set',
     // map
     mapLegend: { untaught: 'Not taught', thin: 'Taught, little evidence', red: 'Below 50%', amber: '50–69%', green: '70%+' },
+    mapMine: 'Taught in my lessons', mapMineHint: 'From your lesson records.',
+    mapSchool: 'Taught at school', mapSchoolHint: 'What the school has covered so far. Tap Edit to tick sub-topics off.',
+    mapPP: 'Past-paper performance', mapPPHint: 'Sub-topics they have done in past papers, by share of marks earned. Tap one to set it by hand.',
+    mapWeakest: 'Weakest',
     setByTutor: 'set by tutor', clearOverride: 'Back to automatic', marksOf: (e) => `${e} marks of evidence`,
     // log attempt
     student: 'Student', date: 'Date', paperYear: 'Paper', what: 'What was done', timed: 'Timed, exam conditions',
@@ -74,6 +78,10 @@ const STRINGS = {
     resetConfirm: '重設家長連結？舊連結會即時失效。', whatsapp: 'WhatsApp 家長',
     mistakeNone: '未有標記失分原因。', fullPaper: '全卷', section: '部分 / 題目',
     mapLegend: { untaught: '未教', thin: '已教，數據未夠', red: '低於 50%', amber: '50–69%', green: '70% 或以上' },
+    mapMine: '我已教', mapMineHint: '根據課堂紀錄。',
+    mapSchool: '學校已教', mapSchoolHint: '學校目前教到嘅課題。㩒「編輯」剔選。',
+    mapPP: '歷屆試題表現', mapPPHint: '做過嘅歷屆試題所涉及嘅課題，按得分率顯示。㩒一下可以手動設定。',
+    mapWeakest: '最弱',
     setByTutor: '導師設定', clearOverride: '改回自動', marksOf: (e) => `${e} 分數據`,
     student: '學生', date: '日期', paperYear: '試卷', what: '做咗咩', timed: '限時（考試模式）',
     whatFull: '全卷（P1 + P2）', whatP1: '只做 Paper 1（MC）', whatP2: '只做 Paper 2（LQ）',

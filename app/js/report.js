@@ -2,7 +2,7 @@
 // The report is laid out as A4-sized HTML pages (so Chinese text and the Kairos fonts render exactly as in the app),
 // each page is captured with html2canvas and placed into a jsPDF document. Libraries load only when a report is made.
 import { t, subName, withLang, getLang } from './i18n.js';
-import { h, fmtDate, pct, today, modal, field, select, toast, trendChart, syllabusMap, mistakeBars } from './ui.js';
+import { h, fmtDate, pct, today, modal, field, select, toast, trendChart, syllabusMap, mistakeBars, gradeLabel } from './ui.js';
 import { levelName, levelValue, itemLabel, mistakeSplit, withDefaults } from './logic.js';
 import { studentView } from './model.js';
 
@@ -67,7 +67,7 @@ function blocks(app, rd) {
   out.push(h('div.r-levels',
     h('div', h('span.label', t('predicted')), v.predicted ? h('div.big', `L${v.predicted.level}`) : h('div.big.muted', '—'),
       h('span.hint', v.predicted ? `${t('basedOn')(v.predicted.basedOn)} · ${t('asOf')(fmtDate(rd.to))}` : t('noPrediction'))),
-    h('div', h('span.label', t('schoolPredicted')), h('div.big', school ? school.predicted_grade : '—'),
+    h('div', h('span.label', t('schoolPredicted')), h('div.big', school ? gradeLabel(school.predicted_grade) : '—'),
       h('span.hint', school ? `${school.exam} · ${fmtDate(school.date)}` : ''))));
 
   if (v.attempts.some((a) => a.pct != null)) out.push(h('section.r-sec', h('h3', t('trend')), trendChart(v.attempts, v.settings)));

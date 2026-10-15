@@ -1,6 +1,6 @@
 // Home and student list.
 import { t } from './i18n.js';
-import { h, fmtDate, today, modal } from './ui.js';
+import { h, fmtDate, today, modal, gradeLabel } from './ui.js';
 import { levelName } from './logic.js';
 import { studentForm } from './views-student.js';
 
@@ -43,7 +43,7 @@ function studentTable(app, students) {
         h('td', h('a', { href: `#/s/${s.id}` }, s.name)),
         h('td', s.form || ''),
         h('td', v.predicted ? h('span.level', `L${v.predicted.level}`) : h('span.muted', '—')),
-        h('td', school ? school.predicted_grade : '—'),
+        h('td', school ? h('span.level', gradeLabel(school.predicted_grade)) : h('span.muted', '—')),
         h('td', v.lastDate ? fmtDate(v.lastDate) : h('span.muted', t('noAttempts'))),
         h('td', h(`span.pill.st-${s.status}`, s.status)));
     }))));

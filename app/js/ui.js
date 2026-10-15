@@ -53,6 +53,11 @@ export function select(options, value, attrs = {}) {
   return h('select', attrs, options.map(([v, l]) => h('option', { value: v, selected: String(v) === String(value ?? '') }, l)));
 }
 
+/** A grade as the app shows it everywhere: "L3", "L5**", or "—". Accepts "3" or an already-prefixed "L3". */
+export function gradeLabel(g) {
+  return g == null || g === '' ? '—' : `L${String(g).replace(/^L/i, '')}`;
+}
+
 // ---------- mistakes ----------
 
 /** Bars for where marks are lost: active types in list order, plus any older tag that still has marks. */
@@ -129,6 +134,16 @@ export const STATES = ['untaught', 'thin', 'red', 'amber', 'green'];
  * Topic rows of sub-topic chips coloured by mastery. onPick(sub, currentState) makes chips clickable.
  * hide = Set of topic codes to leave out (e.g. the elective the student doesn't take).
  */
+/** Sub-topics grouped by topic row, one chip each. only(sub) picks which to show; topics with none are left out. */
+export function subChips(index, { hide = new Set(), only = () => true, chip }) {
+  const wrap = h('div.map');
+  for (const topic of index.bank.topics) {
+    const subs = hide.has(topic.code) ? [] : topic.subtopics.filter(only);
+    if (subs.length) wrap.append(h('div.map-row', h('div.map-topic', h('b', topic.code), ' ', subName(topic)), h('div.map-chips', subs.map(chip))));
+  }
+  return wrap;
+}
+
 export function syllabusMap(index, masteryMap, taught, overrides, settings, { onPick, hide = new Set() } = {}) {
   const wrap = h('div.map');
   for (const topic of index.bank.topics) {
