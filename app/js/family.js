@@ -14,7 +14,7 @@ let bankIndex, data;
 
 async function boot() {
   initLang('zh', 'kairos-lang-family');
-  const bank = await fetch('data/bank.json').then((r) => r.json());
+  const bank = await fetch('data/bank.json', { cache: 'no-cache' }).then((r) => r.json());
   bankIndex = indexBank(bank);
   let store;
   if (isDemo) {

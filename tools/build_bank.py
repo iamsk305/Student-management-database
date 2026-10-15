@@ -259,7 +259,7 @@ def build(res):
         if any(x['id'] == pid for x in p2):
             problems.append(f'EXTRA {pid} already in a booklet')
             continue
-        p2.append({'id': pid, 'q': q, 'label': label, 'marks': marks, 'subs': subs, 'elective': None})
+        p2.append({'id': pid, 'q': q, 'label': label, 'marks': marks, 'subs': subs, 'elective': None, 'fromOther': True})
 
     for y, v in papers.items():
         expected = len(KEYS[y])

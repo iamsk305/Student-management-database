@@ -74,6 +74,8 @@ function build(app, st, attempt, homework, draw) {
   if (st.what === 'questions') parts.push(questionPicker(app, st, draw));
   if (st.what === 'score') parts.push(scoreOnly(app, st));
   if (mc.length) parts.push(mcPad(st, mc));
+  const legacy = legacyLine(app, st, lq);
+  if (legacy) parts.push(h('p.warn', t('legacyOther')(legacy.mark, legacy.max)));
   if (lq.length) parts.push(lqTable(app, st, lq));
   parts.push(finish(app, st, attempt, homework, list));
   return parts;
@@ -125,6 +127,15 @@ function mcPad(st, mc) {
 
 // ---------- LQ marks ----------
 
+/** An old full-paper entry whose untagged parts were saved as one "not in topic bank" line (see LEGACY_OTHER). */
+function legacyLine(app, st, lq) {
+  if (st.what !== 'FULL' && st.what !== 'P2') return null;
+  const item = app.index.items.get(`${st.year}-other`);
+  const a = st.answers.get(item?.id);
+  if (!item?.legacy || !a || !lq.some((it) => it.fromOther)) return null;
+  return { id: item.id, mark: Math.min(+a.mark || 0, item.max), max: item.max, mistakes: a.mistakes || [] };
+}
+
 function lqTable(app, st, lq) {
   const total = h('b');
   const sum = () => {
@@ -165,7 +176,7 @@ function lqTable(app, st, lq) {
     };
     showTags();
     const subs = it.subs.map((s) => app.index.subs.get(s)).filter(Boolean);
-    return h('div.lq-row',
+    return h(it.fromOther && st.answers.has(`${st.year}-other`) ? 'div.lq-row.split' : 'div.lq-row',
       h('div.lq-label', h('b', it.q == null ? t('notInBank') : `Q${it.q}${it.label}`),
         it.elective ? h('span.pill', `${t('electiveQ')} ${it.elective.slice(1)}`) : null,
         st.what === 'questions' ? h('span.muted', ` ${it.year}`) : null,
@@ -231,10 +242,15 @@ function finish(app, st, attempt, homework, list) {
       if (row.p2_score == null) { row.p2_max = null; row.paper = row.p1_score == null ? 'FULL' : 'P1'; }
     }
     // Full papers keep a row for every item (blank = 0); question sets keep only the picked items.
-    const responses = list.map((it) => {
+    // An old single "not in topic bank" line is replaced by its parts once any of them has a mark; until then it is kept.
+    const legacy = legacyLine(app, st, list.filter((i) => i.kind === 'lq'));
+    const entered = (it) => { const m = st.answers.get(it.id)?.mark; return m !== undefined && m !== null && m !== ''; };
+    const keepLegacy = legacy && !list.some((it) => it.fromOther && entered(it));
+    const responses = list.filter((it) => !(keepLegacy && it.fromOther)).map((it) => {
       const a = st.answers.get(it.id) || {};
       return it.kind === 'mc' ? { qid: it.id, choice: a.choice || null } : { qid: it.id, mark: a.mark ?? 0, mistakes: a.mistakes || [] };
     });
+    if (keepLegacy) responses.push({ qid: legacy.id, mark: legacy.mark, mistakes: legacy.mistakes });
     const saved = await app.mutate((store) => store.saveAttempt(row, responses));
     if (homework) {
       const late = homework.due_date && st.date > homework.due_date;

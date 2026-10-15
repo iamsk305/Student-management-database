@@ -193,6 +193,7 @@ table.heat td.s-red { background: var(--red); } table.heat td.s-amber { backgrou
 .mc.cur { outline: 2.5px solid var(--signal); outline-offset: 1px; }
 .lq-row { display: grid; grid-template-columns: 1fr auto; gap: .35rem .9rem; padding: .7rem 0; border-top: 1px solid var(--line); align-items: center; }
 .lq-row .mistakes { grid-column: 1 / -1; }
+.lq-row.split { background: var(--amber-bg); margin: 0 -.6rem; padding-left: .6rem; padding-right: .6rem; }
 .lq-mark { display: flex; align-items: center; gap: .4rem; white-space: nowrap; }
 .lq-mark input { width: 5rem; text-align: center; font-size: 1.1rem; }
 .sub-picker details { border-bottom: 1px solid var(--line); padding: .35rem 0; }

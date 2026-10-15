@@ -42,6 +42,9 @@ export function withDefaults(settings) {
 
 // ---------- bank lookups ----------
 
+/** Marks on each year's old single "not in topic bank" line (bank of 14 Oct 2026, before those parts were tagged). */
+export const LEGACY_OTHER = { 2017: 6, 2019: 22, 2020: 43, 2021: 30, 2022: 28, 2023: 30, 2024: 26, 2025: 28 };
+
 /** Index the bank once: every MC question and LQ part by id. */
 export function indexBank(bank) {
   const items = new Map();
@@ -52,7 +55,16 @@ export function indexBank(bank) {
     }
     for (const p of paper.p2) {
       items.set(p.id, { id: p.id, kind: 'lq', year: +year, q: p.q, label: p.label, max: p.marks,
-        subs: p.subs, elective: p.elective });
+        subs: p.subs, elective: p.elective, fromOther: !!p.fromOther });
+    }
+  }
+  // Papers logged before 14 Oct 2026 put every untagged P2 part on one "not in topic bank" line. Those parts are now
+  // tagged one by one (fromOther in the bank), but old responses still point at the single line, so it stays
+  // scoreable here; it is never offered for new logging and goes away once the paper is re-entered part by part.
+  for (const [year, max] of Object.entries(LEGACY_OTHER)) {
+    const id = `${year}-other`;
+    if (bank.papers[year] && !items.has(id)) {
+      items.set(id, { id, kind: 'lq', year: +year, q: null, label: 'not in topic bank', max, subs: [], elective: null, legacy: true });
     }
   }
   const subs = new Map();

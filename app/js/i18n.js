@@ -34,6 +34,7 @@ const STRINGS = {
     pickSub: 'Add questions by sub-topic', pickItems: 'Questions in this set', saveAttempt: 'Save attempt',
     deleted: 'deleted', notInBank: 'not in topic bank', electiveQ: 'Elective', blankMeans: 'Blank = not answered (0)',
     missingStudentElective: 'Set this student’s elective on their profile to include Section C.',
+    legacyOther: (m, max) => `This paper was logged before the last Paper 2 parts were tagged: they were saved as one line, ${m} / ${max}. Enter the highlighted parts below and save — the single line is then replaced. Leave them empty to keep ${m} / ${max}.`,
     // lessons & homework
     minutes: 'Minutes', covered: 'Sub-topics covered', note: 'Note', addLesson: 'Add lesson',
     title: 'What was set', due: 'Due', addHomework: 'Set homework', hwStatus: { set: 'Set', on_time: 'On time', late: 'Late', missing: 'Missing' },
@@ -82,6 +83,7 @@ const STRINGS = {
     pickSub: '按課題加題目', pickItems: '今次練習嘅題目', saveAttempt: '儲存練習',
     deleted: '已刪除', notInBank: '題庫以外部分', electiveQ: '選修', blankMeans: '留空 = 冇答（0 分）',
     missingStudentElective: '請先喺學生資料揀選修，先可以計 Section C。',
+    legacyOther: (m, max) => `呢份卷係喺 Paper 2 最後幾部分分題之前記錄嘅：嗰幾部分當時合埋一行，${m} / ${max}。請喺下面螢光嘅部分逐題入分再儲存，嗰一行就會被取代。全部留空就會保留 ${m} / ${max}。`,
     minutes: '分鐘', covered: '教咗嘅課題', note: '備註', addLesson: '新增課堂',
     title: '功課內容', due: '限期', addHomework: '新增功課', hwStatus: { set: '已派', on_time: '準時交', late: '遲交', missing: '欠交' },
     exam: '考試', mark: '分數', addResult: '新增成績', predictedGrade: '預測等級',

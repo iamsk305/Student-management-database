@@ -149,6 +149,20 @@ test('default mistake types include definition and left blank', () => {
   eq(withDefaults({ mistakeTypes: [{ key: 'x', en: 'X', zh: 'X' }] }).mistakeTypes.length, 1, 'settings list wins');
 });
 
+test('old single "not in topic bank" line still scores after its parts were tagged', () => {
+  const b = structuredClone(fixture);
+  b.papers[2022].p2 = b.papers[2022].p2.filter((x) => x.id !== '2022-other');
+  b.papers[2022].p2.push({ id: '2022-Q2(a)', q: 2, label: '(a)', marks: 10, subs: ['C.6'], elective: null, fromOther: true });
+  const ix2 = indexBank(b);
+  const old = ix2.items.get('2022-other');
+  eq(old.legacy, true); eq(old.max, 28, 'max from LEGACY_OTHER');
+  eq(ix2.items.get('2022-Q2(a)').fromOther, true);
+  eq(paperItems(ix2, 2022, 'P2').some((i) => i.legacy), false, 'never offered for new logging');
+  const s = attemptScore(ix2, { paper: 'P2', scope: 'full' }, [{ qid: '2022-Q1(a)', mark: 4 }, { qid: '2022-other', mark: 20 }]);
+  eq(s.p2.earned, 24); eq(s.p2.max, 32);
+  eq(ix.items.get('2022-other').max, 10, 'a bank that still has the line keeps its own');
+});
+
 test('wrong letters are counted per MC question', () => {
   const w = wrongLetters(ix, [{ qid: '2022-P1-1', choice: 'C' }, { qid: '2022-P1-1', choice: 'C' }, { qid: '2022-P1-1', choice: 'A' }]);
   eq(w.get('2022-P1-1').C, 2);

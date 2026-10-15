@@ -125,7 +125,7 @@ function loginView() {
 
 async function start() {
   document.getElementById('app').replaceChildren(h('p.loading', t('loading')));
-  const [bank] = await Promise.all([fetch('data/bank.json').then((r) => r.json())]);
+  const [bank] = await Promise.all([fetch('data/bank.json', { cache: 'no-cache' }).then((r) => r.json())]);
   app.index = indexBank(bank);
   await app.reload();
 }
@@ -134,7 +134,7 @@ async function boot() {
   initLang('en');
   if (isDemo) {
     const { demoSeed } = await import('./demo.js');
-    const bank = await fetch('data/bank.json').then((r) => r.json());
+    const bank = await fetch('data/bank.json', { cache: 'no-cache' }).then((r) => r.json());
     app.store = demoStore(demoSeed(indexBank(bank)));
   } else {
     app.store = supabaseStore();
