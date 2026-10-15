@@ -47,7 +47,7 @@ const STRINGS = {
     bands: 'Map colours', red: 'Red below', green: 'Green from', minEvidence: 'Min. marks of evidence', halfLife: 'Half-life (days)',
     exportAll: 'Export everything (Excel)', exportHint: 'One file, one sheet per table. Keep it as your backup.',
     bankBuilt: (d) => `Question bank exported from the Word booklets on ${d}.`,
-    mistake: { concept: 'Concept wrong', misapplied: 'Misapplied', expression: 'Weak expression', diagram: 'Diagram error', incomplete: 'Incomplete / time' },
+    mistake: { concept: 'Concept wrong', careless: 'Careless mistake', expression: 'Weak expression', diagram: 'Diagram error', incomplete: 'Incomplete / time' },
     // family page
     familyTitle: 'Progress report', familyIntro: 'Updated after every marked paper.', ppRecord: 'Past-paper record',
     mistakeTypesTitle: 'Reasons marks are lost', hide: 'Hide',
@@ -93,7 +93,7 @@ const STRINGS = {
     bands: '進度圖顏色', red: '紅色：低於', green: '綠色：由', minEvidence: '最少數據（分）', halfLife: '半衰期（日）',
     exportAll: '匯出全部資料（Excel）', exportHint: '一個檔案，每個表一頁。可以當備份。',
     bankBuilt: (d) => `題庫於 ${d} 由 Word 檔匯出。`,
-    mistake: { concept: '概念錯', misapplied: '應用錯', expression: '表達弱', diagram: '圖錯', incomplete: '未完成／夠鐘' },
+    mistake: { concept: '概念錯', careless: '粗心', expression: '表達弱', diagram: '圖錯', incomplete: '未完成／夠鐘' },
     familyTitle: '學習進度報告', familyIntro: '每份改好嘅試卷都會即時更新。', ppRecord: '歷屆試題紀錄',
     mistakeTypesTitle: '失分原因', hide: '隱藏',
     mistakeTypesHint: '可以改名、新增或隱藏。隱藏咗嘅原因唔會再出現喺記錄頁，但舊紀錄會保留。',

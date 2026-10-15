@@ -33,7 +33,7 @@ export function demoSeed(index) {
         responses.push({ id: `r-${n}-${it.id}`, attempt_id: id, qid: it.id, choice: it.key ? (right ? it.key : wrong[Math.floor(rand() * 3)]) : null, mistakes: [] });
       } else {
         const mark = Math.round(it.max * Math.min(1, Math.max(0, p + (rand() - 0.5) * 0.4)) * 2) / 2;
-        const lost = mark < it.max ? ['concept', 'expression', 'diagram', 'misapplied', 'incomplete'].filter(() => rand() < 0.35) : [];
+        const lost = mark < it.max ? ['concept', 'expression', 'diagram', 'careless', 'incomplete'].filter(() => rand() < 0.35) : [];
         responses.push({ id: `r-${n}-${it.id}`, attempt_id: id, qid: it.id, mark, mistakes: lost.length ? lost : mark < it.max ? ['expression'] : [] });
       }
     }

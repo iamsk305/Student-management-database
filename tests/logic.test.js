@@ -146,7 +146,7 @@ test('mistake split keeps tags from older lists and covers new types', () => {
 test('default mistake types include definition and left blank', () => {
   const keys = withDefaults().mistakeTypes.map((m) => m.key);
   eq(keys.includes('definition') && keys.includes('blank'), true);
-  eq(withDefaults({ mistakeTypes: [{ key: 'x', en: 'X', zh: 'X' }] }).mistakeTypes.length, 1, 'settings list wins');
+  eq(withDefaults({ mistakeTypes: [{ key: 'careless', en: 'X', zh: 'X' }] }).mistakeTypes.length, 1, 'settings list wins');
 });
 
 test('old single "not in topic bank" line still scores after its parts were tagged', () => {
@@ -161,6 +161,16 @@ test('old single "not in topic bank" line still scores after its parts were tagg
   const s = attemptScore(ix2, { paper: 'P2', scope: 'full' }, [{ qid: '2022-Q1(a)', mark: 4 }, { qid: '2022-other', mark: 20 }]);
   eq(s.p2.earned, 24); eq(s.p2.max, 32);
   eq(ix.items.get('2022-other').max, 10, 'a bank that still has the line keeps its own');
+});
+
+test('careless replaces misapplied, including on lists saved earlier', () => {
+  const vis = (s) => withDefaults(s).mistakeTypes.filter((m) => !m.hidden).map((m) => m.key);
+  eq(vis().includes('careless'), true); eq(vis().includes('misapplied'), false);
+  const old = { mistakeTypes: [{ key: 'concept', en: 'C', zh: 'C' }, { key: 'misapplied', en: 'M', zh: 'M' }, { key: 'blank', en: 'B', zh: 'B' }] };
+  eq(withDefaults(old).mistakeTypes.map((m) => m.key).join(), 'concept,careless,misapplied,blank');
+  eq(vis(old).join(), 'concept,careless,blank');
+  const later = { mistakeTypes: [{ key: 'careless', en: 'X', zh: 'X', hidden: true }, { key: 'misapplied', en: 'M', zh: 'M' }] };
+  eq(vis(later).join(), 'misapplied', 'once careless exists, Settings decides');
 });
 
 test('wrong letters are counted per MC question', () => {

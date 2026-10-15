@@ -5,7 +5,8 @@ export const LEVELS = ['1', '2', '3', '4', '5', '5*', '5**'];
 export const DEFAULT_MISTAKES = [
   { key: 'concept', en: 'Concept wrong', zh: '概念錯' },
   { key: 'definition', en: 'Definition not memorised', zh: '定義未背熟' },
-  { key: 'misapplied', en: 'Misapplied', zh: '應用錯' },
+  { key: 'careless', en: 'Careless mistake', zh: '粗心' },
+  { key: 'misapplied', en: 'Misapplied', zh: '應用錯', hidden: true }, // retired 15 Oct 2026; kept so old tags keep their name
   { key: 'expression', en: 'Weak expression', zh: '表達弱' },
   { key: 'diagram', en: 'Diagram error', zh: '圖錯' },
   { key: 'incomplete', en: 'Incomplete / ran out of time', zh: '未完成／夠鐘' },
@@ -29,6 +30,15 @@ export const DEFAULT_SETTINGS = {
   cutoffs: DEFAULT_CUTOFFS,
 };
 
+/** Lists saved before 15 Oct 2026: add "Careless mistake" and hide "Misapplied" (once — afterwards Settings decides). */
+function withCareless(types) {
+  if (types.some((m) => m.key === 'careless')) return types;
+  const out = types.map((m) => (m.key === 'misapplied' ? { ...m, hidden: true } : m));
+  const at = out.findIndex((m) => m.key === 'misapplied');
+  out.splice(at < 0 ? out.length : at, 0, DEFAULT_MISTAKES.find((m) => m.key === 'careless'));
+  return out;
+}
+
 export function withDefaults(settings) {
   const s = settings || {};
   return {
@@ -36,7 +46,7 @@ export function withDefaults(settings) {
     mastery: { ...DEFAULT_SETTINGS.mastery, ...s.mastery },
     predictWeights: s.predictWeights || DEFAULT_SETTINGS.predictWeights,
     cutoffs: { ...DEFAULT_CUTOFFS, ...s.cutoffs },
-    mistakeTypes: s.mistakeTypes?.length ? s.mistakeTypes : DEFAULT_MISTAKES,
+    mistakeTypes: s.mistakeTypes?.length ? withCareless(s.mistakeTypes) : DEFAULT_MISTAKES,
   };
 }
 
