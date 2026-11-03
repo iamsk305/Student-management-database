@@ -248,3 +248,54 @@ dialog.modal::backdrop { background: rgba(12, 22, 38, .45); }
 .report-page .r-foot { margin-top: auto; display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-faint); border-top: 1px solid var(--line); padding-top: 8px; }
 .report-page .chip-name { display: inline; }
 .mistake-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: .5rem; align-items: center; }
+
+/* ---------- Nov 2026 refresh: one bold band, quiet everything else ---------- */
+:root { --radius: 14px; --band: #16294A; --band-ink: #F2EFE8; --band-soft: rgba(242, 239, 232, .62); --gold: #D6A65A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --band: #1B2D4D; } }
+.page { gap: 1.5rem; padding-top: 1.75rem; }
+h1 { font-size: 2.1rem; font-weight: 500; letter-spacing: -.01em; line-height: 1.15; }
+h2 { font-size: 1.12rem; margin-bottom: 1rem; }
+.page-head p.muted { margin-top: .35rem; }
+.label, table.data th { text-transform: none; letter-spacing: 0; font-size: .85rem; }
+.card { border-color: transparent; box-shadow: 0 1px 0 var(--line); padding: 1.3rem 1.45rem; }
+.stack, .page > .stack { gap: 1.5rem; }
+.grid2, .grid3 { gap: 1.5rem; }
+
+/* tabs: quieter rail, clearer active state */
+.tabs { gap: 1.4rem; border-bottom-color: var(--line); }
+.tabs a { padding: .55rem 0; border-bottom-width: 3px; }
+.tabs a.on { font-weight: 600; border-color: var(--gold); }
+.tabs a:hover { color: var(--ink); }
+
+/* the one bold element: the level band */
+.level-card { background: var(--band); color: var(--band-ink); box-shadow: none; padding: 1.5rem 1.8rem; gap: 2rem; }
+.level-card > div + div { border-left: 1px solid rgba(242, 239, 232, .18); padding-left: 2rem; }
+.level-card .label, .level-card .hint { color: var(--band-soft); }
+.level-card .big { color: var(--band-ink); font-size: 4rem; font-weight: 500; letter-spacing: -.02em; margin: .1rem 0 .2rem; }
+.level-card .big small { color: var(--gold); font-size: 1.15rem; font-weight: 500; letter-spacing: 0; }
+.level-card .big.muted { color: var(--band-soft); }
+
+/* home: three columns read as one strip */
+.page > .grid3 > .card { background: transparent; box-shadow: none; border-top: 3px solid var(--ink); border-radius: 0; padding: .9rem 0 0; }
+.page > .grid3 .list { gap: .55rem; }
+
+/* tables */
+table.data th, table.data td { padding: .7rem .6rem; }
+table.data td a { text-decoration: none; font-weight: 500; }
+table.data tr.clickable:hover td a { text-decoration: underline; }
+
+/* mistakes and next practice */
+.bar-row { grid-template-columns: 12rem 1fr 3rem; }
+.bar { height: 8px; border-radius: 4px; }
+.bar i { border-radius: 4px; }
+.next { padding: .85rem 0; }
+.next-items { margin-top: .4rem; }
+.tag { background: transparent; border: 1px solid var(--line); }
+
+@media (max-width: 520px) {
+  h1 { font-size: 1.6rem; }
+  .level-card { padding: 1.2rem; gap: 1rem; }
+  .level-card > div + div { padding-left: 1rem; }
+  .level-card .big { font-size: 2.8rem; }
+  .bar-row { grid-template-columns: 8rem 1fr 2.6rem; }
+}
