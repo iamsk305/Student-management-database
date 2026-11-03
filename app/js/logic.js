@@ -181,9 +181,34 @@ export const levelName = (v) => (v == null ? '—' : LEVELS[Math.min(6, Math.max
  * Predicted level from timed full papers only: the newest papers weighted 3 : 2 : 1.
  * Each paper is placed on its own year's cut-offs first, so papers from different years compare fairly.
  */
+/**
+ * A year's P1 and P2 logged as separate whole-paper attempts count as one full paper (the newest timed P1 and P2
+ * of that year, dated on the later of the two). Question sets never pair up.
+ */
+export function combineSplitPapers(papers, settings) {
+  const s = withDefaults(settings);
+  const byYear = new Map();
+  for (const p of papers) {
+    if (!p.timed || !p.year || p.scope === 'questions' || (p.paper !== 'P1' && p.paper !== 'P2')) continue;
+    const half = p.paper === 'P1' ? p.p1 : p.p2;
+    if (!half || !(half.max > 0)) continue;
+    const y = byYear.get(p.year) || {};
+    if (!y[p.paper] || y[p.paper].date < p.date) y[p.paper] = p;
+    byYear.set(p.year, y);
+  }
+  const out = [];
+  for (const [year, { P1, P2 }] of byYear) {
+    if (!P1 || !P2) continue;
+    const pct = 100 * (s.weights.p1 * P1.p1.earned / P1.p1.max + s.weights.p2 * P2.p2.earned / P2.p2.max);
+    out.push({ year, date: P1.date > P2.date ? P1.date : P2.date, timed: true, full: true, combined: true,
+      p1: P1.p1, p2: P2.p2, pct, parts: [P1.id, P2.id] });
+  }
+  return out;
+}
+
 export function predictLevel(papers, settings) {
   const s = withDefaults(settings);
-  const usable = papers.filter((p) => p.full && p.timed && p.pct != null && p.year)
+  const usable = [...papers, ...combineSplitPapers(papers, s)].filter((p) => p.full && p.timed && p.pct != null && p.year)
     .sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, s.predictWeights.length);
   if (!usable.length) return null;
   let num = 0, den = 0;

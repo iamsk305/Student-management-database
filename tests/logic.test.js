@@ -1,7 +1,7 @@
 // Run from the student-tracker folder:  jsc -m tests/logic.test.js
 // (jsc = macOS JavaScriptCore: /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc)
 import {
-  indexBank, paperItems, markMC, attemptScore, levelValue, levelName, predictLevel, mastery, masteryState,
+  indexBank, paperItems, markMC, attemptScore, levelValue, levelName, predictLevel, combineSplitPapers, mastery, masteryState,
   mistakeSplit, wrongLetters, nextPractice, itemLabel, DEFAULT_CUTOFFS, withDefaults, mySubs,
 } from '../app/js/logic.js';
 
@@ -94,6 +94,21 @@ test('predicted level: timed full papers only, newest weighted 3:2:1', () => {
   eq(p.level, '3');
   eq(p.basedOn, 3);
   eq(predictLevel([{ full: true, timed: false, pct: 90, year: 2022, date: '2026-01-01' }]), null);
+});
+
+test('separately logged P1 and P2 of one year count as a full paper', () => {
+  const papers = [
+    { id: 'a', paper: 'P1', scope: 'full', timed: true, year: 2018, date: '2026-10-01', p1: { earned: 30, max: 40 }, p2: null },
+    { id: 'b', paper: 'P2', scope: 'full', timed: true, year: 2018, date: '2026-10-05', p1: null, p2: { earned: 60, max: 120 } },
+    { id: 'c', paper: 'P2', scope: 'questions', timed: true, year: 2019, date: '2026-10-05', p1: null, p2: { earned: 8, max: 8 } },
+    { id: 'd', paper: 'P1', scope: 'full', timed: true, year: 2019, date: '2026-10-05', p1: { earned: 30, max: 40 }, p2: null },
+  ];
+  const c = combineSplitPapers(papers);
+  eq(c.length, 1);
+  near(c[0].pct, 0.3 * 75 + 0.7 * 50, 1e-9);
+  eq(c[0].date, '2026-10-05');
+  eq(predictLevel(papers).basedOn, 1);
+  eq(combineSplitPapers(papers.map((p) => ({ ...p, timed: false }))).length, 0);
 });
 
 test('mastery decays with age and splits multi-topic parts', () => {
