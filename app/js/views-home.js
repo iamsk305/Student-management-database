@@ -1,7 +1,7 @@
 // Home and student list.
 import { t } from './i18n.js';
 import { h, fmtDate, today, modal, gradeLabel, sparkline, pct } from './ui.js';
-import { levelName } from './logic.js';
+import { levelName, combineSplitPapers } from './logic.js';
 import { studentForm } from './views-student.js';
 
 const daysSince = (d) => (d ? Math.floor((Date.parse(today()) - Date.parse(d)) / 86400000) : Infinity);
@@ -43,6 +43,12 @@ export function homeView(app) {
 const GRADES = ['1', '2', '3', '4', '5', '5*', '5**'];
 const gradeRank = (g) => GRADES.indexOf(String(g ?? '').replace(/^L/i, ''));
 
+/** Full papers only, newest first, with a year's separately logged P1 and P2 counted as one. */
+function fullPapers(v) {
+  const pairs = combineSplitPapers(v.attempts, v.settings, { timedOnly: false });
+  return [...v.attempts.filter((a) => a.full), ...pairs].sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
 /** One card per student: big predicted level, recent scores, and a flag when school's grade disagrees. */
 function studentCards(app, students) {
   if (!students.length) return h('p.muted', t('none'));
@@ -55,7 +61,7 @@ function studentCards(app, students) {
       h('div.sc-top', h('b.sc-name', s.name), h('span.muted', [s.form, s.status !== 'Active' ? s.status : null].filter(Boolean).join(' · '))),
       h('div.sc-mid',
         v.predicted ? h('span.sc-level', `L${v.predicted.level}`) : h('span.sc-level.none', '—'),
-        sparkline(v.attempts)),
+        sparkline(fullPapers(v))),
       h('div.sc-foot',
         gap ? h(theirs > ours ? 'span.flag.up' : 'span.flag.down', t('schoolSays')(gradeLabel(school.predicted_grade)))
           : h('span.muted', school ? `${t('school')} ${gradeLabel(school.predicted_grade)}` : ''),
