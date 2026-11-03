@@ -1,6 +1,6 @@
 // Tiny DOM helpers + the two shared visuals (score trend, syllabus map).
 import { t, subName, getLang } from './i18n.js';
-import { levelName, levelValue, withDefaults, masteryState } from './logic.js';
+import { levelName, levelValue, withDefaults, masteryState, combineSplitPapers } from './logic.js';
 
 /** h('div.card', {onclick}, child, ...) — tag with optional .classes, attributes/props, children. */
 export function h(sel, attrs, ...kids) {
@@ -111,11 +111,14 @@ export function trendChart(points, settings) {
     svg.append(e);
     return e;
   };
-  const data = points.filter((p) => p.pct != null).sort((a, b) => (a.date < b.date ? -1 : 1));
+  // One step per paper in the order done (not by date); a year's separate P1 and P2 make one point.
+  const pairs = combineSplitPapers(points, s, { timedOnly: false });
+  const paired = new Set(pairs.flatMap((p) => p.parts));
+  const data = [...points.filter((p) => !paired.has(p.id)), ...pairs.map((p) => ({ ...p, label: `${p.year} P1 + P2` }))]
+    .filter((p) => p.pct != null).sort((a, b) => (a.date < b.date ? -1 : 1));
   if (!data.length) return h('p.muted', t('noAttempts'));
-  const t0 = Date.parse(data[0].date), t1 = Date.parse(data.at(-1).date);
-  const span = Math.max(t1 - t0, 86400000 * 14);
-  const X = (d) => L + (W - L - R) * (data.length === 1 ? 0.5 : (Date.parse(d) - t0) / span);
+  data.forEach((p, i) => { p.i = i; });
+  const X = (p) => L + 16 + (W - L - R - 32) * (data.length === 1 ? 0.5 : p.i / (data.length - 1));
   const Y = (v) => T + (H - T - B) * (1 - v / 100);
 
   const year = Math.max(...data.map((p) => p.year || 0)) || Math.max(...Object.keys(s.cutoffs).map(Number));
@@ -130,17 +133,19 @@ export function trendChart(points, settings) {
   }
   for (const v of [0, 50, 100]) el('text', { x: L - 6, y: Y(v) + 4, class: 'axis', 'text-anchor': 'end' }, `${v}%`);
   el('line', { x1: L, x2: W - R, y1: Y(0), y2: Y(0), class: 'base' });
-  const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  el('text', { x: X(data[0].date), y: H - 8, class: 'axis', 'text-anchor': data.length === 1 ? 'middle' : 'start' }, fmt(data[0].date));
-  if (data.length > 1) el('text', { x: X(data.at(-1).date), y: H - 8, class: 'axis', 'text-anchor': 'end' }, fmt(data.at(-1).date));
-
+  const every = Math.ceil(data.length / 8);
+  data.forEach((p, i) => {
+    if (i % every && i !== data.length - 1) return;
+    const short = p.full ? String(p.year || '') : p.label.replace(/^\d{4} /, '').replace(' · ', ' ');
+    el('text', { x: X(p), y: H - 8, class: 'axis', 'text-anchor': 'middle' }, short || '·');
+  });
   const full = data.filter((p) => p.full);
-  if (full.length > 1) el('polyline', { points: full.map((p) => `${X(p.date)},${Y(p.pct)}`).join(' '), class: 'line' });
+  if (full.length > 1) el('polyline', { points: full.map((p) => `${X(p)},${Y(p.pct)}`).join(' '), class: 'line' });
   for (const p of data) {
-    const c = el('circle', { cx: X(p.date), cy: Y(p.pct), r: p.full ? 5 : 4, class: p.full ? 'dot full' : 'dot' });
+    const c = el('circle', { cx: X(p), cy: Y(p.pct), r: p.full ? 5 : 4, class: p.full ? 'dot full' : 'dot' });
     const lv = p.full ? ` · L${levelName(levelValue(p.pct, p.year, s.cutoffs))}` : '';
     const title = document.createElementNS(NS, 'title');
-    title.textContent = `${p.label} — ${p.pct.toFixed(1)}%${lv}`;
+    title.textContent = `${p.label} · ${new Date(p.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} — ${p.pct.toFixed(1)}%${lv}`;
     c.append(title);
   }
   return h('div.chart', svg, h('div.legend', h('span.k.full', t('fullPaper')), h('span.k', t('section'))));
