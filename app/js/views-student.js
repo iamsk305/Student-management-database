@@ -54,8 +54,8 @@ function overview(app, s, v) {
 
   return h('div.stack',
     FAMILY_LINKS ? h('div.grid2', levelCard, familyCard(app, s)) : levelCard,
-    h('section.card', h('h2', t('trend')), trendChart(v.attempts, v.settings)),
-    h('div.grid2', mistakes, next));
+    h('div.grid-wide', h('section.card', h('h2', t('trend')), trendChart(v.attempts, v.settings)), mistakes),
+    next);
 }
 
 function familyCard(app, s) {

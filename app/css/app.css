@@ -275,9 +275,33 @@ h2 { font-size: 1.12rem; margin-bottom: 1rem; }
 .level-card .big small { color: var(--gold); font-size: 1.15rem; font-weight: 500; letter-spacing: 0; }
 .level-card .big.muted { color: var(--band-soft); }
 
-/* home: three columns read as one strip */
-.page > .grid3 > .card { background: transparent; box-shadow: none; border-top: 3px solid var(--ink); border-radius: 0; padding: .9rem 0 0; }
-.page > .grid3 .list { gap: .55rem; }
+/* home: student cards on the left, the week's to-dos down the right */
+.home { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 2.5rem; align-items: start; }
+.home-side { display: flex; flex-direction: column; gap: 1.6rem; position: sticky; top: 4.5rem; }
+.home-side section { border-top: 3px solid var(--ink); padding-top: .8rem; }
+.home-side h2 { font-size: 1rem; margin-bottom: .55rem; }
+.home-side .list { gap: .45rem; font-size: .93rem; }
+.student-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
+.student-card { display: flex; flex-direction: column; gap: .7rem; padding: 1.1rem 1.2rem 1rem; border-radius: var(--radius);
+  background: var(--surface); box-shadow: 0 1px 0 var(--line); text-decoration: none; color: var(--ink);
+  border-top: 4px solid var(--band); transition: transform .15s; }
+.student-card:hover { transform: translateY(-2px); }
+.student-card.left { opacity: .55; }
+.sc-top { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.sc-name { font-size: 1.15rem; font-weight: 600; }
+.sc-mid { display: flex; align-items: flex-end; justify-content: space-between; gap: .8rem; }
+.sc-level { font-size: 3rem; font-weight: 500; line-height: 1; letter-spacing: -.02em; }
+.sc-level.none { color: var(--ink-faint); }
+.spark { width: 120px; height: 36px; flex-shrink: 0; }
+.spark polyline { fill: none; stroke: var(--signal); stroke-width: 2; stroke-linejoin: round; }
+.spark circle { fill: var(--signal); }
+.sc-foot { display: flex; justify-content: space-between; gap: .5rem; font-size: .82rem; border-top: 1px solid var(--line); padding-top: .6rem; }
+.flag { font-weight: 600; border-radius: 999px; padding: .05rem .55rem; }
+.flag.up { background: var(--green-bg); color: var(--green); }
+.flag.down { background: var(--red-bg); color: var(--red); }
+.grid-wide { display: grid; grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr); gap: 1.5rem; align-items: start; }
+@media (max-width: 900px) { .home, .grid-wide { grid-template-columns: 1fr; } .home-side { position: static; } }
+@media (prefers-reduced-motion: reduce) { .student-card { transition: none; } .student-card:hover { transform: none; } }
 
 /* tables */
 table.data th, table.data td { padding: .7rem .6rem; }
@@ -285,7 +309,7 @@ table.data td a { text-decoration: none; font-weight: 500; }
 table.data tr.clickable:hover td a { text-decoration: underline; }
 
 /* mistakes and next practice */
-.bar-row { grid-template-columns: 12rem 1fr 3rem; }
+.bar-row { grid-template-columns: 10.5rem 1fr 3rem; }
 .bar { height: 8px; border-radius: 4px; }
 .bar i { border-radius: 4px; }
 .next { padding: .85rem 0; }

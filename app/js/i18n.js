@@ -44,7 +44,7 @@ const STRINGS = {
     title: 'What was set', due: 'Due', addHomework: 'Set homework', hwStatus: { set: 'Set', on_time: 'On time', late: 'Late', missing: 'Missing' },
     exam: 'Exam', mark: 'Mark', addResult: 'Add result', predictedGrade: 'Predicted grade',
     // home
-    today: 'Today', dueSoon: 'Homework due or overdue', quiet: 'No attempt in 14+ days', allClear: 'Nothing here.',
+    today: 'Today', dueSoon: 'Homework due or overdue', quiet: 'No attempt in 14+ days', thisWeek: 'Done this week', schoolSays: (g) => `School says ${g}`, school: 'School', allClear: 'Nothing here.',
     // class / bank / settings
     classHint: 'Active students × sub-topics. Tap a student to open them.', attemptedBy: 'Attempted', avgScore: 'Average',
     wrongPicks: 'Wrong answers chosen', cutoffs: 'Level cut-offs (% of full mark)', weights: 'Paper weights',
@@ -95,7 +95,7 @@ const STRINGS = {
     minutes: '分鐘', covered: '教咗嘅課題', note: '備註', addLesson: '新增課堂',
     title: '功課內容', due: '限期', addHomework: '新增功課', hwStatus: { set: '已派', on_time: '準時交', late: '遲交', missing: '欠交' },
     exam: '考試', mark: '分數', addResult: '新增成績', predictedGrade: '預測等級',
-    today: '今日', dueSoon: '就到期 / 已過期功課', quiet: '超過 14 日未有練習', allClear: '冇嘢要跟。',
+    today: '今日', dueSoon: '就到期 / 已過期功課', quiet: '超過 14 日未有練習', thisWeek: '今個星期做咗', schoolSays: (g) => `學校預測 ${g}`, school: '學校', allClear: '冇嘢要跟。',
     classHint: '在讀學生 × 課題。撳學生名打開。', attemptedBy: '做過', avgScore: '平均',
     wrongPicks: '揀錯嘅答案', cutoffs: '等級分數線（佔滿分 %）', weights: '試卷比重',
     bands: '進度圖顏色', red: '紅色：低於', green: '綠色：由', minEvidence: '最少數據（分）', halfLife: '半衰期（日）',

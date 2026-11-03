@@ -54,6 +54,26 @@ export function select(options, value, attrs = {}) {
 }
 
 /** A grade as the app shows it everywhere: "L3", "L5**", or "—". Accepts "3" or an already-prefixed "L3". */
+/** Tiny line of the last few scores (oldest left), for student cards. */
+export function sparkline(attempts, n = 8) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const pts = attempts.filter((a) => a.pct != null).slice(0, n).reverse();
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 120 36');
+  svg.setAttribute('class', 'spark');
+  svg.setAttribute('aria-hidden', 'true');
+  if (pts.length < 2) return svg;
+  const lo = Math.min(...pts.map((p) => p.pct)) - 5, hi = Math.max(...pts.map((p) => p.pct)) + 5;
+  const X = (i) => 4 + 112 * i / (pts.length - 1), Y = (v) => 32 - 28 * (v - lo) / Math.max(hi - lo, 20);
+  const line = document.createElementNS(NS, 'polyline');
+  line.setAttribute('points', pts.map((p, i) => `${X(i)},${Y(p.pct)}`).join(' '));
+  svg.append(line);
+  const end = document.createElementNS(NS, 'circle');
+  end.setAttribute('cx', X(pts.length - 1)); end.setAttribute('cy', Y(pts.at(-1).pct)); end.setAttribute('r', 3);
+  svg.append(end);
+  return svg;
+}
+
 export function gradeLabel(g) {
   return g == null || g === '' ? '—' : `L${String(g).replace(/^L/i, '')}`;
 }
@@ -78,7 +98,7 @@ export function mistakeBars(split, types) {
 export function trendChart(points, settings) {
   const s = withDefaults(settings);
   const NS = 'http://www.w3.org/2000/svg';
-  const W = 860, H = 260, L = 44, R = 40, T = 14, B = 28;
+  const W = 560, H = 230, L = 44, R = 40, T = 14, B = 28;
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('class', 'trend');
