@@ -183,13 +183,14 @@ export const levelName = (v) => (v == null ? '—' : LEVELS[Math.min(6, Math.max
  */
 /**
  * A year's P1 and P2 logged as separate whole-paper attempts count as one full paper (the newest timed P1 and P2
- * of that year, dated on the later of the two). Question sets never pair up.
+ * of that year, dated on the later of the two). Question sets never pair up. With timedOnly false (the PP record list)
+ * untimed halves pair too, and the pair counts as timed only if both halves were.
  */
-export function combineSplitPapers(papers, settings) {
+export function combineSplitPapers(papers, settings, { timedOnly = true } = {}) {
   const s = withDefaults(settings);
   const byYear = new Map();
   for (const p of papers) {
-    if (!p.timed || !p.year || p.scope === 'questions' || (p.paper !== 'P1' && p.paper !== 'P2')) continue;
+    if ((timedOnly && !p.timed) || !p.year || p.scope === 'questions' || (p.paper !== 'P1' && p.paper !== 'P2')) continue;
     const half = p.paper === 'P1' ? p.p1 : p.p2;
     if (!half || !(half.max > 0)) continue;
     const y = byYear.get(p.year) || {};
@@ -200,8 +201,8 @@ export function combineSplitPapers(papers, settings) {
   for (const [year, { P1, P2 }] of byYear) {
     if (!P1 || !P2) continue;
     const pct = 100 * (s.weights.p1 * P1.p1.earned / P1.p1.max + s.weights.p2 * P2.p2.earned / P2.p2.max);
-    out.push({ year, date: P1.date > P2.date ? P1.date : P2.date, timed: true, full: true, combined: true,
-      p1: P1.p1, p2: P2.p2, pct, parts: [P1.id, P2.id] });
+    out.push({ year, date: P1.date > P2.date ? P1.date : P2.date, timed: !!(P1.timed && P2.timed), full: true, combined: true,
+      p1: P1.p1, p2: P2.p2, pct, parts: [P1.id, P2.id], halves: [P1, P2] });
   }
   return out;
 }

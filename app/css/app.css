@@ -323,3 +323,4 @@ table.data tr.clickable:hover td a { text-decoration: underline; }
   .level-card .big { font-size: 2.8rem; }
   .bar-row { grid-template-columns: 8rem 1fr 2.6rem; }
 }
+.half { border-top: 1px solid var(--line); padding-top: .6rem; }

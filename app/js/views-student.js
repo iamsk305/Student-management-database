@@ -1,7 +1,7 @@
 // One student: overview, syllabus map, PP record, lessons, homework, school results, profile.
 import { t, subName } from './i18n.js';
 import { h, fmtDate, today, pct, modal, field, select, toast, trendChart, syllabusMap, STATES, mistakeBars, gradeLabel, subChips } from './ui.js';
-import { levelName, levelValue, itemLabel, masteryState, mySubs } from './logic.js';
+import { levelName, levelValue, itemLabel, masteryState, mySubs, combineSplitPapers } from './logic.js';
 import { newToken } from './store.js';
 import { FAMILY_LINKS } from './config.js';
 import { reportDialog } from './report.js';
@@ -134,7 +134,28 @@ function mapTab(app, s, v) {
 
 function attemptsTab(app, s, v) {
   if (!v.attempts.length) return h('p.muted', t('noAttempts'));
-  return h('div.stack', v.attempts.map((a) => {
+  // A year's P1 and P2 logged separately show as one full-paper card; each half keeps its own edit and delete.
+  const pairs = combineSplitPapers(v.attempts, v.settings, { timedOnly: false });
+  const paired = new Set(pairs.flatMap((p) => p.parts));
+  const rows = [...v.attempts.filter((a) => !paired.has(a.id)), ...pairs].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  const actions = (a) => [
+    h('a.button.small', { href: `#/log/edit/${a.id}` }, t('edit')),
+    h('button.small.danger', { type: 'button', onclick: () => { if (confirm(t('confirmDelete'))) app.mutate((st) => st.remove('attempts', a.id)); } }, t('delete'))];
+  return h('div.stack', rows.map((a) => {
+    if (a.combined) {
+      const lv = levelName(levelValue(a.pct, a.year, v.settings.cutoffs));
+      return h('section.card.attempt',
+        h('div.attempt-head',
+          h('div', h('b', `${a.year} P1 + P2`), ' ', a.timed ? h('span.pill', '⏱') : null, h('span.muted', ` · ${fmtDate(a.date)}`)),
+          h('div.score', pct(a.pct, 1), h('span.level', ` L${lv}`))),
+        a.halves.map((half) => {
+          const sc = half.paper === 'P1' ? half.p1 : half.p2;
+          return h('div.half',
+            h('div.row.spread', h('span', h('b', half.paper), h('span.muted', ` ${sc.earned}/${sc.max} · ${fmtDate(half.date)}`)), h('div.row', actions(half))),
+            half.comment ? h('p', '💬 ', half.comment) : null,
+            half.private_note ? h('p.private', '🔒 ', half.private_note) : null);
+        }));
+    }
     const lv = a.full ? levelName(levelValue(a.pct, a.year, v.settings.cutoffs)) : null;
     return h('section.card.attempt',
       h('div.attempt-head',
@@ -143,9 +164,7 @@ function attemptsTab(app, s, v) {
       h('p.muted', [a.p1 ? `P1 ${a.p1.earned}/${a.p1.max}` : null, a.p2 ? `P2 ${a.p2.earned}/${a.p2.max}` : null].filter(Boolean).join(' · ')),
       a.comment ? h('p', '💬 ', a.comment) : null,
       a.private_note ? h('p.private', '🔒 ', a.private_note) : null,
-      h('div.row',
-        h('a.button.small', { href: `#/log/edit/${a.id}` }, t('edit')),
-        h('button.small.danger', { type: 'button', onclick: () => { if (confirm(t('confirmDelete'))) app.mutate((st) => st.remove('attempts', a.id)); } }, t('delete'))));
+      h('div.row', actions(a)));
   }));
 }
 

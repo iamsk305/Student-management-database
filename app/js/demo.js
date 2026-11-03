@@ -49,6 +49,10 @@ export function demoSeed(index) {
   });
   addAttempt(alex, 0.55, { date: day(-12), year: null, paper: 'P2', scope: 'questions', timed: false, comment: 'Topic C homework set.' },
     [...index.items.values()].filter((i) => i.kind === 'lq' && i.subs.includes('C.6')).slice(0, 4));
+  // 2018 done as two sittings, P1 and P2 logged separately (shows as one full paper).
+  addAttempt(alex, 0.6, { date: day(-3), year: 2018, paper: 'P1', scope: 'full', timed: true, comment: 'P1 in class.' }, paperItems(index, 2018, 'P1'));
+  addAttempt(alex, 0.6, { date: day(-1), year: 2018, paper: 'P2', scope: 'full', timed: true, elective: alex.elective, comment: 'P2 at home.' },
+    paperItems(index, 2018, 'P2', alex.elective));
   school_results.push({ id: 'sr-1', student_id: alex.id, date: day(-40), exam: 'F6 Mock', mark: 61, max: 100, predicted_grade: '3' });
 
   // Bella: F5, topic sets only.
